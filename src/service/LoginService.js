@@ -1,25 +1,30 @@
+import { backendUrl } from "../config/config";
+
 export class LoginService {
 
-    async Login(username, password) {
+    async Login(data) {
         try {
-            const url = new URL("http://localhost:8080/login");
+            const url = new URL(backendUrl + "/api/v1/user/login");
         
-
-            fetch(url, {
+           const response =  await fetch(url, {
                 method: "POST",
-                body:{
-                    username: username,
-                    password: password
-                },
-
+                headers: {
+                    "Content-Type": "application/json"
+                  },
+                body:JSON.stringify(data)
 
                 }
-            })
-                .then((response) => response.json())
-                .then((data) => console.log(data))
-                .catch((error) => console.error(error));
+            )
+            if (response.ok){
+                const data = await response.json();
+                return data;
+            }else{
+                const errorData = await response.json();
+                throw errorData;
+            }
+               
         } catch (error) {
-            alert(error);
+            throw error;
         }
     }
 
