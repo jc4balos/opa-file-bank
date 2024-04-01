@@ -4,10 +4,9 @@ import Modal from "react-bootstrap/Modal";
 
 const ErrorModal = (props) => {
   const [errorMessages, setErrorMessages] = useState(props.errorMessages);
-  console.log(errorMessages);
   useEffect(() => {
     setErrorMessages(props.errorMessages);
-  });
+  }, [props.errorMessages]);
 
   return (
     <Modal
@@ -19,11 +18,7 @@ const ErrorModal = (props) => {
       <Modal.Header className="bg-danger text-light" closeButton>
         <Modal.Title>{props.errorModalHeading}</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
-        {Object.entries(errorMessages).map(([key, value]) => {
-          return <span className="d-block">{value}</span>;
-        })}
-      </Modal.Body>
+      <Modal.Body>{errorMessages}</Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={props.closeErrorModal}>
           Close

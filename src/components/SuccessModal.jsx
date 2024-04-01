@@ -7,7 +7,7 @@ const SuccessModal = (props) => {
   console.log(SuccessMessages);
   useEffect(() => {
     setSuccessMessages(props.successMessages);
-  });
+  },[props.successMessages]);
 
   return (
     <div>
