@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import { Navigation } from "../components/Navigation";
 import { FileService } from "../service/FileService";
 
@@ -27,19 +27,21 @@ const UploadFile = () => {
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <Form.Group className="mb-3" controlId="formBasicEmail">
-        <Form.Label>File</Form.Label>
-        <Form.Control
-          name="image"
-          type="file"
-          placeholder="Placeholder text"
-          onChange={handleFileChange}
-        />
-      </Form.Group>
-      <Button variant="primary" type="submit">
-        Submit
-      </Button>
-    </Form>
+    <Container></Container>
+
+    // <Form onSubmit={handleSubmit}>
+    //   <Form.Group className="mb-3" controlId="formBasicEmail">
+    //     <Form.Label>File</Form.Label>
+    //     <Form.Control
+    //       name="image"
+    //       type="file"
+    //       placeholder="Placeholder text"
+    //       onChange={handleFileChange}
+    //     />
+    //   </Form.Group>
+    //   <Button variant="primary" type="submit">
+    //     Submit
+    //   </Button>
+    // </Form>
   );
 };

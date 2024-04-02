@@ -1,17 +1,14 @@
-import { backendUrl } from "../config/config";
-
-export class LoginService {
-  async login(data) {
+export class SessionService {
+  async getSessionData() {
     try {
-      const url = new URL(backendUrl + "/api/v1/user/login");
+      const url = new URL(backendUrl + "/api/v1/user/session");
 
       const response = await fetch(url, {
-        method: "POST",
+        method: "GET",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
       });
       return response;
     } catch (error) {

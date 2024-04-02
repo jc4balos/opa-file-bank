@@ -26,7 +26,15 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Dashboard />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="/dashboard"
+          element={
+            <Dashboard
+              showSuccessModal={showSuccessModal}
+              showErrorModal={showErrorModal}
+            />
+          }
+        />
         <Route
           path="/login"
           element={

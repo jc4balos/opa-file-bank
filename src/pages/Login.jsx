@@ -41,6 +41,9 @@ const LoginForm = (props) => {
       if (response.ok) {
         const data = await response.json();
         await props.showSuccessModal(data.message);
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 2000);
       } else {
         const data = await response.json();
         await props.showErrorModal(data.message);
