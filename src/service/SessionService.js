@@ -1,7 +1,9 @@
+import { backendUrl } from "../config/config";
+
 export class SessionService {
   async getSessionData() {
     try {
-      const url = new URL(backendUrl + "/api/v1/user/session");
+      const url = new URL(backendUrl + "/api/v1/session");
 
       const response = await fetch(url, {
         method: "GET",

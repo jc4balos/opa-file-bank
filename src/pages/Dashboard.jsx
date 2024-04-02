@@ -1,47 +1,50 @@
-import { useState } from "react";
-import { Container } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Col, Container, Row, Stack } from "react-bootstrap";
 import { Navigation } from "../components/Navigation";
-import { FileService } from "../service/FileService";
+import { SessionService } from "../service/SessionService";
 
 export const Dashboard = () => {
   return (
     <div>
       <Navigation />
-      <UploadFile />
+      <Container>
+        <Row>
+          <Col lg="2">
+            <SideNav />
+          </Col>
+          <Col lg="10"></Col>
+        </Row>
+      </Container>
     </div>
   );
 };
 
-const UploadFile = () => {
-  const [file, setFile] = useState(null);
+const SideNav = () => {
+  const [userFullName, setUserFullName] = useState("");
+  const [userName, setUserName] = useState("");
+  const [userTitle, setUserTitle] = useState("");
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
+  useEffect(() => {
+    const fetchSessionData = async () => {
+      const sessionService = new SessionService();
+      const response = await sessionService.getSessionData();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("file", file);
-    const fileService = new FileService();
-    fileService.uploadFile(file);
-  };
+      if (response.status === 200) {
+        const data = await response.json();
+        setUserFullName(data.userFullName);
+        setUserName(data.userName);
+        setUserTitle(data.userTitle);
+      }
+    };
+
+    fetchSessionData();
+  }, [userFullName, userName, userTitle]);
 
   return (
-    <Container></Container>
-
-    // <Form onSubmit={handleSubmit}>
-    //   <Form.Group className="mb-3" controlId="formBasicEmail">
-    //     <Form.Label>File</Form.Label>
-    //     <Form.Control
-    //       name="image"
-    //       type="file"
-    //       placeholder="Placeholder text"
-    //       onChange={handleFileChange}
-    //     />
-    //   </Form.Group>
-    //   <Button variant="primary" type="submit">
-    //     Submit
-    //   </Button>
-    // </Form>
+    <Stack className="">
+      <span className="fw-bold text-center">{userFullName}</span>
+      <small className="text-center">{userTitle}</small>
+      <small className="text-muted text-center">@{userName}</small>
+    </Stack>
   );
 };
