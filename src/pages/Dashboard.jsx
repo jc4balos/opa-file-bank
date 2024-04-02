@@ -1,50 +1,155 @@
+import { faFile, faFolder, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
-import { Col, Container, Row, Stack } from "react-bootstrap";
+import {
+  Breadcrumb,
+  Button,
+  Card,
+  Col,
+  Container,
+  Form,
+  Row,
+  Stack,
+} from "react-bootstrap";
 import { Navigation } from "../components/Navigation";
-import { SessionService } from "../service/SessionService";
+import "../css/dashboard.css";
+import { FolderService } from "../service/FolderService";
 
-export const Dashboard = () => {
+export const Dashboard = (props) => {
+  const [currentFolderId, setCurrentFolderId] = useState(1);
+
   return (
     <div>
       <Navigation />
       <Container>
         <Row>
-          <Col lg="2">
-            <SideNav />
+          <Col className="d-none d-lg-flex" lg="2">
+            <SideNav
+              userId={props.userId}
+              accessLevelId={props.accessLevelId}
+              userFullName={props.userFullName}
+              userName={props.userName}
+              userTitle={props.userTitle}
+            />
           </Col>
-          <Col lg="10"></Col>
+          <Col lg="10">
+            <MainNavigation
+              currentFolderId={currentFolderId}
+              setCurrentFolderId={setCurrentFolderId}
+              userId={props.userId}
+            />
+            <Content
+              userId={props.userId}
+              currentFolderId={currentFolderId}
+              showErrorModal={props.showErrorModal}
+              setCurrentFolderId={setCurrentFolderId}
+            />
+          </Col>
         </Row>
       </Container>
     </div>
   );
 };
 
-const SideNav = () => {
-  const [userFullName, setUserFullName] = useState("");
-  const [userName, setUserName] = useState("");
-  const [userTitle, setUserTitle] = useState("");
+const SideNav = (props) => {
+  return (
+    <Stack className="">
+      <span className="fw-bold text-center">{props.userFullName}</span>
+      <small className="text-center">{props.userTitle}</small>
+      <small className="text-muted text-center">@{props.userName}</small>
+    </Stack>
+  );
+};
+
+const MainNavigation = (props) => {
+  return (
+    <div>
+      <Breadcrumb>
+        <Breadcrumb.Item
+          onClick={() => {
+            props.setCurrentFolderId(1);
+            console.log(props.currentFolderId);
+          }}>
+          root
+        </Breadcrumb.Item>
+        <Breadcrumb.Item></Breadcrumb.Item>
+      </Breadcrumb>
+      <Form>
+        <Button className="m-1">
+          <FontAwesomeIcon icon={faPlus} />
+          <span>New File</span>
+        </Button>
+
+        <Button className="m-1">
+          <FontAwesomeIcon icon={faFolder} />
+          <span>New Folder</span>
+        </Button>
+      </Form>
+    </div>
+  );
+};
+
+const Content = (props) => {
+  const [files, setFiles] = useState([]);
+  const [folders, setFolders] = useState([]); //search this
 
   useEffect(() => {
-    const fetchSessionData = async () => {
-      const sessionService = new SessionService();
-      const response = await sessionService.getSessionData();
-
-      if (response.status === 200) {
-        const data = await response.json();
-        setUserFullName(data.userFullName);
-        setUserName(data.userName);
-        setUserTitle(data.userTitle);
+    const fetchFilesAndFolders = async () => {
+      try {
+        const folderService = new FolderService();
+        const response = await folderService.getAllFilesInFolder(
+          props.currentFolderId,
+          props.userId
+        );
+        console.log(response);
+        setFiles(response.files);
+        setFolders(response.folders);
+      } catch (error) {
+        props.showErrorModal(JSON.stringify(error.message));
       }
     };
 
-    fetchSessionData();
-  }, [userFullName, userName, userTitle]);
+    if (props.userId) {
+      fetchFilesAndFolders();
+    }
+  }, [props.currentFolderId, props.userId]);
+
+  const handleFolderClick = (folderId) => {
+    props.setCurrentFolderId(folderId);
+  };
 
   return (
-    <Stack className="">
-      <span className="fw-bold text-center">{userFullName}</span>
-      <small className="text-center">{userTitle}</small>
-      <small className="text-muted text-center">@{userName}</small>
-    </Stack>
+    <div>
+      <Row>
+        {folders.map((folder) => {
+          return (
+            <Col styl lg="2" md="4" sm="6" xs="6" key={folder.folderId}>
+              <Card
+                onClick={() => {
+                  handleFolderClick(folder.folderId);
+                }}
+                className="zoom-on-hover bg-light p-2 m-1 justify-content-center align-items-center"
+                style={{ height: "100px" }}>
+                <FontAwesomeIcon style={{ fontSize: "30px" }} icon={faFolder} />
+                <span>{folder.folderName}</span>
+              </Card>
+            </Col>
+          );
+        })}
+        {files.map((file) => {
+          return (
+            <Col lg="2" md="4" sm="6" xs="6" key={file.fileId}>
+              <Card
+                className="zoom-on-hover bg-light p-2 m-1 justify-content-center align-items-center"
+                style={{ height: "100px" }}>
+                <FontAwesomeIcon style={{ fontSize: "30px" }} icon={faFile} />
+                <span className="text-truncate">{file.fileName}</span>
+                <span>.{file.fileType}</span>
+              </Card>
+            </Col>
+          );
+        })}
+      </Row>
+    </div>
   );
 };
