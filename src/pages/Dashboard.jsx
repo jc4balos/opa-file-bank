@@ -19,6 +19,7 @@ import {
   Tooltip,
 } from "react-bootstrap";
 import { Navigation } from "../components/Navigation";
+import { NewFolder } from "../components/NewFolder";
 import "../css/dashboard.css";
 import { FolderService } from "../service/FolderService";
 
@@ -67,6 +68,9 @@ export const Dashboard = (props) => {
               folderDirectory={folderDirectory}
               resetDirectory={resetDirectory}
               removeDirectoryAfterIndex={removeDirectoryAfterIndex}
+              showInfoModal={props.showInfoModal}
+              showErrorModal={props.showErrorModal}
+              showSuccessModal={props.showSuccessModal}
             />
             <Content
               userId={props.userId}
@@ -95,8 +99,21 @@ const SideNav = (props) => {
 };
 
 const MainNavigation = (props) => {
+  const [newFolderModalState, setNewFolderModalState] = useState(false);
+
   return (
     <div>
+      {newFolderModalState && (
+        <NewFolder
+          showNewFolderModal={setNewFolderModalState}
+          showErrorModal={props.showErrorModal}
+          showSuccessModal={props.showSuccessModal}
+          currentFolderId={props.currentFolderId}
+          closeNewFolderModal={() => {
+            setNewFolderModalState(false);
+          }}
+        />
+      )}
       <Breadcrumb>
         <Breadcrumb.Item
           onClick={() => {
@@ -125,7 +142,11 @@ const MainNavigation = (props) => {
           <span>New File</span>
         </Button>
 
-        <Button className="m-1">
+        <Button
+          onClick={() => {
+            setNewFolderModalState(true);
+          }}
+          className="m-1">
           <FontAwesomeIcon icon={faFolder} />
           <span>New Folder</span>
         </Button>
@@ -169,7 +190,7 @@ const Content = (props) => {
         <span>Folders</span>
         {folders.map((folder) => {
           return (
-            <Col styl lg="3" md="4" sm="6" xs="6" key={folder.folderId}>
+            <Col lg="3" md="4" sm="6" xs="6" key={folder.folderId}>
               <OverlayTrigger
                 placement="bottom"
                 overlay={<Tooltip>{folder.folderDescription}</Tooltip>}>

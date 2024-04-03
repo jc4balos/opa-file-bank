@@ -23,4 +23,28 @@ export class FolderService {
       return error;
     }
   }
+
+  async addFolder(data) {
+    console.log(
+      "service",
+      data.folderName,
+      data.folderDescription,
+      data.parentFolderId
+    );
+    try {
+      const url = new URL(backendUrl + "/api/v1/folder/create-folder");
+
+      const response = await fetch(url, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      return response;
+    } catch (error) {
+      return error;
+    }
+  }
 }

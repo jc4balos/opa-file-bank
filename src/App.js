@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { ErrorModal } from "./components/ErrorModal";
+import { InfoModal } from "./components/InfoModal";
 import { SuccessModal } from "./components/SuccessModal";
 import { Dashboard } from "./pages/Dashboard";
 import { Login } from "./pages/Login";
@@ -12,6 +13,11 @@ function App() {
   const [errorData, setErrorData] = useState([]);
   const [successModalState, setSuccessModalState] = useState(false);
   const [successData, setSuccessData] = useState([]);
+  const [infoModalState, setInfoModalState] = useState(false);
+  const [infoModalHeading, setInfoModalHeading] = useState([]);
+  const [infoModalMessage, setInfoModalMessage] = useState([]);
+  const [infoModalAction, setInfoModalAction] = useState(() => {});
+  const [infoModalActionText, setInfoModalActionText] = useState([]);
 
   const [userFullName, setUserFullName] = useState("");
   const [userName, setUserName] = useState("");
@@ -47,6 +53,19 @@ function App() {
     setErrorModalState(true);
   };
 
+  const showInfoModal = (
+    infoModalHeading,
+    infoModalMessage,
+    infoModalAction,
+    infoModalActionText
+  ) => {
+    setInfoModalHeading(infoModalHeading);
+    setInfoModalMessage(infoModalMessage);
+    setInfoModalAction(() => infoModalAction);
+    setInfoModalActionText(infoModalActionText);
+    setInfoModalState(true);
+  };
+
   return (
     <BrowserRouter>
       <Routes>
@@ -57,6 +76,7 @@ function App() {
             <Dashboard
               showSuccessModal={showSuccessModal}
               showErrorModal={showErrorModal}
+              showInfoModal={showInfoModal}
               userId={userId}
               accessLevelId={accessLevelId}
               userFullName={userFullName}
@@ -94,6 +114,18 @@ function App() {
           }}
           successModalHeading={"Success"}
           successMessages={successData}
+        />
+      )}
+      {infoModalState && (
+        <InfoModal
+          showInfoModal={infoModalState}
+          closeInfoModal={() => {
+            setInfoModalState(false);
+          }}
+          infoModalHeading={infoModalHeading}
+          infoModalMessage={infoModalMessage}
+          infoModalAction={infoModalAction}
+          infoModalActionText={infoModalActionText}
         />
       )}
     </BrowserRouter>

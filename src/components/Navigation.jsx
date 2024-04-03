@@ -50,7 +50,7 @@ export const Navigation = () => {
               </Nav.Link>
             )}
           </Nav>
-          <Dropdown className="d-none d-lg-grid">
+          <Dropdown align={{ lg: "end" }} className="d-none d-lg-grid">
             <Dropdown.Toggle id="dropdown-basic">
               <FontAwesomeIcon icon={faCog} />
             </Dropdown.Toggle>
