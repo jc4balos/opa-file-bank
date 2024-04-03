@@ -18,6 +18,26 @@ import { FolderService } from "../service/FolderService";
 export const Dashboard = (props) => {
   const [currentFolderId, setCurrentFolderId] = useState(1);
 
+  const [folderDirectory, setFolderDirectory] = useState([]);
+
+  const addFolderOnDirectory = (folderId, folderName) => {
+    console.log("executed");
+    setFolderDirectory([
+      ...folderDirectory,
+      { folderId: folderId, folderName: folderName },
+    ]);
+  };
+
+  const resetDirectory = () => {
+    setFolderDirectory([]);
+  };
+
+  const removeDirectoryAfterIndex = (index) => {
+    setFolderDirectory((prevFolderDirectory) =>
+      prevFolderDirectory.slice(0, index + 1)
+    );
+  };
+
   return (
     <div>
       <Navigation />
@@ -37,12 +57,18 @@ export const Dashboard = (props) => {
               currentFolderId={currentFolderId}
               setCurrentFolderId={setCurrentFolderId}
               userId={props.userId}
+              folderDirectory={folderDirectory}
+              resetDirectory={resetDirectory}
+              removeDirectoryAfterIndex={removeDirectoryAfterIndex}
             />
             <Content
               userId={props.userId}
               currentFolderId={currentFolderId}
               showErrorModal={props.showErrorModal}
               setCurrentFolderId={setCurrentFolderId}
+              addFolderOnDirectory={addFolderOnDirectory}
+              resetDirectory={resetDirectory}
+              removeDirectoryAfterIndex={removeDirectoryAfterIndex}
             />
           </Col>
         </Row>
@@ -68,11 +94,23 @@ const MainNavigation = (props) => {
         <Breadcrumb.Item
           onClick={() => {
             props.setCurrentFolderId(1);
-            console.log(props.currentFolderId);
+            props.resetDirectory();
           }}>
           root
         </Breadcrumb.Item>
-        <Breadcrumb.Item></Breadcrumb.Item>
+        {props.folderDirectory.map((folder, index) => {
+          console.log(index);
+          return (
+            <Breadcrumb.Item
+              key={index}
+              onClick={() => {
+                props.setCurrentFolderId(folder.folderId);
+                props.removeDirectoryAfterIndex(index);
+              }}>
+              {folder.folderName}
+            </Breadcrumb.Item>
+          );
+        })}
       </Breadcrumb>
       <Form>
         <Button className="m-1">
@@ -127,6 +165,10 @@ const Content = (props) => {
               <Card
                 onClick={() => {
                   handleFolderClick(folder.folderId);
+                  props.addFolderOnDirectory(
+                    folder.folderId,
+                    folder.folderName
+                  );
                 }}
                 className="zoom-on-hover bg-light p-2 m-1 justify-content-center align-items-center"
                 style={{ height: "100px" }}>

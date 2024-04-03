@@ -22,6 +22,7 @@ export const Navigation = () => {
       <Container>
         <img
           src="logo.png"
+          alt="logo"
           style={{ height: "40px" }}
           className="pe-lg-3 p-1"></img>
         <Navbar.Brand href="#home">
