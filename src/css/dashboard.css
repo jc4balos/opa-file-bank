@@ -1,8 +1,19 @@
+@import "./bootstrap.css";
+
 .zoom-on-hover {
   transition: transform 0.3s ease;
 }
 
 .zoom-on-hover:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
   cursor: pointer;
+}
+
+.ellipsis-v {
+  transition: background-color 0.5s ease;
+}
+
+.ellipsis-v:hover {
+  cursor: pointer;
+  background-color: var(--bs-gray-200);
 }

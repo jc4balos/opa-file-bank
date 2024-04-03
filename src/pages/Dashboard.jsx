@@ -1,4 +1,9 @@
-import { faFile, faFolder, faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEllipsisV,
+  faFile,
+  faFolder,
+  faPlus,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import {
@@ -8,8 +13,10 @@ import {
   Col,
   Container,
   Form,
+  OverlayTrigger,
   Row,
   Stack,
+  Tooltip,
 } from "react-bootstrap";
 import { Navigation } from "../components/Navigation";
 import "../css/dashboard.css";
@@ -159,34 +166,56 @@ const Content = (props) => {
   return (
     <div>
       <Row>
+        <span>Folders</span>
         {folders.map((folder) => {
           return (
-            <Col styl lg="2" md="4" sm="6" xs="6" key={folder.folderId}>
-              <Card
-                onClick={() => {
-                  handleFolderClick(folder.folderId);
-                  props.addFolderOnDirectory(
-                    folder.folderId,
-                    folder.folderName
-                  );
-                }}
-                className="zoom-on-hover bg-light p-2 m-1 justify-content-center align-items-center"
-                style={{ height: "100px" }}>
-                <FontAwesomeIcon style={{ fontSize: "30px" }} icon={faFolder} />
-                <span>{folder.folderName}</span>
-              </Card>
+            <Col styl lg="3" md="4" sm="6" xs="6" key={folder.folderId}>
+              <OverlayTrigger
+                placement="bottom"
+                overlay={<Tooltip>{folder.folderDescription}</Tooltip>}>
+                <Card
+                  onDoubleClick={() => {
+                    handleFolderClick(folder.folderId);
+                    props.addFolderOnDirectory(
+                      folder.folderId,
+                      folder.folderName
+                    );
+                  }}
+                  className="zoom-on-hover bg-light p-2 m-1">
+                  <div className="d-flex justify-content-between align-items-center">
+                    <span className="text-truncate">
+                      <FontAwesomeIcon icon={faFolder} /> {folder.folderName}
+                    </span>
+                    <span className="p-2 ellipsis-v rounded">
+                      <FontAwesomeIcon icon={faEllipsisV} />
+                    </span>
+                  </div>
+                </Card>
+              </OverlayTrigger>
             </Col>
           );
         })}
+      </Row>
+      <Row>
+        <span>Files</span>
         {files.map((file) => {
           return (
-            <Col lg="2" md="4" sm="6" xs="6" key={file.fileId}>
+            <Col lg="3" md="4" sm="6" xs="6" key={file.fileId}>
               <Card
-                className="zoom-on-hover bg-light p-2 m-1 justify-content-center align-items-center"
-                style={{ height: "100px" }}>
-                <FontAwesomeIcon style={{ fontSize: "30px" }} icon={faFile} />
-                <span className="text-truncate">{file.fileName}</span>
-                <span>.{file.fileType}</span>
+                className="zoom-on-hover bg-light p-2 m-1 "
+                style={{ height: "200px" }}>
+                <div
+                  className="align-items-top d-flex"
+                  style={{ width: "100%" }}>
+                  <span>
+                    {file.fileName}.{file.fileType}
+                  </span>
+                </div>
+                <div
+                  className="d-flex justify-content-center align-items-center"
+                  style={{ height: "100%" }}>
+                  <FontAwesomeIcon style={{ fontSize: "30px" }} icon={faFile} />
+                </div>
               </Card>
             </Col>
           );
