@@ -21,6 +21,7 @@ export const NewFolder = (props) => {
       console.log("executed");
       if (response.ok) {
         props.showSuccessModal("Folder Added Successfully");
+        props.showNewFolderModal(false);
       } else {
         const data = await response.json();
         const stringArray = data.map((item) => JSON.stringify(item));

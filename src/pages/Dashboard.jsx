@@ -20,16 +20,51 @@ import {
 } from "react-bootstrap";
 import { Navigation } from "../components/Navigation";
 import { NewFolder } from "../components/NewFolder";
+import { BasicSpinner } from "../components/Spinners";
 import "../css/dashboard.css";
 import { FolderService } from "../service/FolderService";
 
 export const Dashboard = (props) => {
+  const [isLoading, setIsLoading] = useState(true); // Add this line
+
   const [currentFolderId, setCurrentFolderId] = useState(1);
 
   const [folderDirectory, setFolderDirectory] = useState([]);
 
+  const [files, setFiles] = useState([]);
+  const [folders, setFolders] = useState([]); //search this
+
+  useEffect(() => {
+    const fetchFilesAndFolders = async () => {
+      try {
+        const folderService = new FolderService();
+        const response = await folderService.getAllFilesInFolder(
+          currentFolderId,
+          props.userId
+        );
+        setFiles(response.files);
+        setFolders(response.folders);
+      } catch (error) {
+        props.showErrorModal(JSON.stringify(error.message));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (props.userId) {
+      fetchFilesAndFolders();
+    }
+  }, [currentFolderId, props.userId]);
+
+  if (isLoading) {
+    return <BasicSpinner />;
+  }
+
+  const handleFolderClick = (folderId) => {
+    setCurrentFolderId(folderId);
+  };
+
   const addFolderOnDirectory = (folderId, folderName) => {
-    console.log("executed");
     setFolderDirectory([
       ...folderDirectory,
       { folderId: folderId, folderName: folderName },
@@ -71,6 +106,11 @@ export const Dashboard = (props) => {
               showInfoModal={props.showInfoModal}
               showErrorModal={props.showErrorModal}
               showSuccessModal={props.showSuccessModal}
+              folders={folders}
+              files={files}
+              setFolders={setFolders}
+              setFiles={setFiles}
+              handleFolderClick={handleFolderClick}
             />
             <Content
               userId={props.userId}
@@ -80,6 +120,11 @@ export const Dashboard = (props) => {
               addFolderOnDirectory={addFolderOnDirectory}
               resetDirectory={resetDirectory}
               removeDirectoryAfterIndex={removeDirectoryAfterIndex}
+              folders={folders}
+              files={files}
+              setFolders={setFolders}
+              setFiles={setFiles}
+              handleFolderClick={handleFolderClick}
             />
           </Col>
         </Row>
@@ -123,7 +168,6 @@ const MainNavigation = (props) => {
           root
         </Breadcrumb.Item>
         {props.folderDirectory.map((folder, index) => {
-          console.log(index);
           return (
             <Breadcrumb.Item
               key={index}
@@ -156,39 +200,11 @@ const MainNavigation = (props) => {
 };
 
 const Content = (props) => {
-  const [files, setFiles] = useState([]);
-  const [folders, setFolders] = useState([]); //search this
-
-  useEffect(() => {
-    const fetchFilesAndFolders = async () => {
-      try {
-        const folderService = new FolderService();
-        const response = await folderService.getAllFilesInFolder(
-          props.currentFolderId,
-          props.userId
-        );
-        console.log(response);
-        setFiles(response.files);
-        setFolders(response.folders);
-      } catch (error) {
-        props.showErrorModal(JSON.stringify(error.message));
-      }
-    };
-
-    if (props.userId) {
-      fetchFilesAndFolders();
-    }
-  }, [props.currentFolderId, props.userId]);
-
-  const handleFolderClick = (folderId) => {
-    props.setCurrentFolderId(folderId);
-  };
-
   return (
     <div>
       <Row>
         <span>Folders</span>
-        {folders.map((folder) => {
+        {props.folders.map((folder) => {
           return (
             <Col lg="3" md="4" sm="6" xs="6" key={folder.folderId}>
               <OverlayTrigger
@@ -196,7 +212,8 @@ const Content = (props) => {
                 overlay={<Tooltip>{folder.folderDescription}</Tooltip>}>
                 <Card
                   onDoubleClick={() => {
-                    handleFolderClick(folder.folderId);
+                    console.log("executed");
+                    props.handleFolderClick(folder.folderId);
                     props.addFolderOnDirectory(
                       folder.folderId,
                       folder.folderName
@@ -219,7 +236,7 @@ const Content = (props) => {
       </Row>
       <Row>
         <span>Files</span>
-        {files.map((file) => {
+        {props.files.map((file) => {
           return (
             <Col lg="3" md="4" sm="6" xs="6" key={file.fileId}>
               <Card
