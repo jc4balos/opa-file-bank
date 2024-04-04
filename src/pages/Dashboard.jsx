@@ -35,26 +35,27 @@ export const Dashboard = (props) => {
   const [folders, setFolders] = useState([]); //search this
 
   useEffect(() => {
-    const fetchFilesAndFolders = async () => {
-      try {
-        const folderService = new FolderService();
-        const response = await folderService.getAllFilesInFolder(
-          currentFolderId,
-          props.userId
-        );
-        setFiles(response.files);
-        setFolders(response.folders);
-      } catch (error) {
-        props.showErrorModal(JSON.stringify(error.message));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     if (props.userId) {
       fetchFilesAndFolders();
     }
   }, [currentFolderId, props.userId]);
+
+  const fetchFilesAndFolders = async () => {
+    try {
+      setIsLoading(true);
+      const folderService = new FolderService();
+      const response = await folderService.getAllFilesInFolder(
+        currentFolderId,
+        props.userId
+      );
+      setFiles(response.files);
+      setFolders(response.folders);
+    } catch (error) {
+      props.showErrorModal(JSON.stringify(error.message));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (isLoading) {
     return <BasicSpinner />;
@@ -111,6 +112,7 @@ export const Dashboard = (props) => {
               setFolders={setFolders}
               setFiles={setFiles}
               handleFolderClick={handleFolderClick}
+              fetchFilesAndFolders={fetchFilesAndFolders}
             />
             <Content
               userId={props.userId}
@@ -154,6 +156,7 @@ const MainNavigation = (props) => {
           showErrorModal={props.showErrorModal}
           showSuccessModal={props.showSuccessModal}
           currentFolderId={props.currentFolderId}
+          fetchFilesAndFolders={props.fetchFilesAndFolders}
           closeNewFolderModal={() => {
             setNewFolderModalState(false);
           }}

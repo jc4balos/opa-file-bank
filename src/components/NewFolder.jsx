@@ -30,6 +30,8 @@ export const NewFolder = (props) => {
       }
     } catch (error) {
       props.showErrorModal(JSON.stringify(error.message));
+    } finally {
+      props.fetchFilesAndFolders();
     }
   };
 
