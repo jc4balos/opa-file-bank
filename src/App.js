@@ -37,6 +37,9 @@ function App() {
         setUserTitle(data.userTitle);
         setAccessLevelId(data.accessLevelId);
         setUserId(data.userId);
+      } else {
+        const data = await response.json();
+        showErrorModal(data.message);
       }
     };
 
