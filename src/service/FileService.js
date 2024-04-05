@@ -1,27 +1,19 @@
+import { backendUrl } from "../config/config";
+
 export class FileService {
-  async uploadFile(file) {
+  async uploadFile(formData) {
     console.log("running upload file");
     try {
-      const formData = new FormData();
-      for (let i = 0; i < file.length; i++) {
-        formData.append("file", file);
-      }
-      console.log("file", file);
-      console.log("formdata:", formData);
+      const url = new URL(backendUrl + "/api/v1/file/create-file");
 
-      const url = new URL("http://localhost:8080/file/system");
-      const params = new URLSearchParams({});
-
-      // Pass formData as the body of the fetch request
-      fetch(url, {
+      const response = await fetch(url, {
         method: "POST",
+        credentials: "include",
         body: formData,
-      })
-        .then((response) => response.json())
-        .then((data) => console.log(data))
-        .catch((error) => console.error(error));
+      });
+      return response;
     } catch (error) {
-      alert(error);
+      return error;
     }
   }
 }

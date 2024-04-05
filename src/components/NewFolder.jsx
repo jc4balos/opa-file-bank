@@ -76,11 +76,11 @@ export const NewFolder = (props) => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={props.closeNewFolderModal}>
+          <Button variant="outline-danger" onClick={props.closeNewFolderModal}>
             Close
           </Button>
           <Button
-            variant="primary"
+            variant="secondary"
             onClick={() => {
               addFolder();
             }}>

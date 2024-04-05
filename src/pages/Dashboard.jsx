@@ -19,6 +19,7 @@ import {
   Tooltip,
 } from "react-bootstrap";
 import { Navigation } from "../components/Navigation";
+import { NewFile } from "../components/NewFile";
 import { NewFolder } from "../components/NewFolder";
 import { BasicSpinner } from "../components/Spinners";
 import "../css/dashboard.css";
@@ -147,6 +148,7 @@ const SideNav = (props) => {
 
 const MainNavigation = (props) => {
   const [newFolderModalState, setNewFolderModalState] = useState(false);
+  const [newFileModalState, setNewFileModalState] = useState(false);
 
   return (
     <div>
@@ -161,6 +163,17 @@ const MainNavigation = (props) => {
             setNewFolderModalState(false);
           }}
         />
+      )}
+      {newFileModalState && (
+        <NewFile
+          showNewFileModal={setNewFileModalState}
+          showErrorModal={props.showErrorModal}
+          showSuccessModal={props.showSuccessModal}
+          currentFolderId={props.currentFolderId}
+          fetchFilesAndFolders={props.fetchFilesAndFolders}
+          closeNewFileModal={() => {
+            setNewFileModalState(false);
+          }}></NewFile>
       )}
       <Breadcrumb>
         <Breadcrumb.Item
@@ -184,7 +197,11 @@ const MainNavigation = (props) => {
         })}
       </Breadcrumb>
       <Form>
-        <Button className="m-1">
+        <Button
+          onClick={() => {
+            setNewFileModalState(true);
+          }}
+          className="m-1">
           <FontAwesomeIcon icon={faPlus} />
           <span>New File</span>
         </Button>
@@ -205,8 +222,13 @@ const MainNavigation = (props) => {
 const Content = (props) => {
   return (
     <div>
+      {props.folders.length == 0 && props.files.length == 0 && (
+        <div className="d-flex justify-content-center align-items-center">
+          This folder is empty.
+        </div>
+      )}
       <Row>
-        <span>Folders</span>
+        {props.folders.length != 0 && <span>Folders</span>}
         {props.folders.map((folder) => {
           return (
             <Col lg="3" md="4" sm="6" xs="6" key={folder.folderId}>
@@ -238,26 +260,40 @@ const Content = (props) => {
         })}
       </Row>
       <Row>
-        <span>Files</span>
+        {props.files.length != 0 && <span>Files</span>}
         {props.files.map((file) => {
           return (
             <Col lg="3" md="4" sm="6" xs="6" key={file.fileId}>
-              <Card
-                className="zoom-on-hover bg-light p-2 m-1 "
-                style={{ height: "200px" }}>
-                <div
-                  className="align-items-top d-flex"
-                  style={{ width: "100%" }}>
-                  <span>
-                    {file.fileName}.{file.fileType}
-                  </span>
-                </div>
-                <div
-                  className="d-flex justify-content-center align-items-center"
-                  style={{ height: "100%" }}>
-                  <FontAwesomeIcon style={{ fontSize: "30px" }} icon={faFile} />
-                </div>
-              </Card>
+              <OverlayTrigger
+                placement="bottom"
+                overlay={<Tooltip>{file.description}</Tooltip>}>
+                <Card
+                  className="zoom-on-hover bg-light p-2 m-1 "
+                  style={{ height: "200px" }}>
+                  <div
+                    className="align-items-top d-flex justify-content-between"
+                    style={{ width: "100%" }}>
+                    <div
+                      className="align-items-center d-flex text-truncate"
+                      style={{ width: "100%" }}>
+                      <span className="text-truncate">{file.fileName}</span>
+                      <span>.{file.fileType}</span>
+                    </div>
+
+                    <span className="p-2 ellipsis-v rounded">
+                      <FontAwesomeIcon icon={faEllipsisV} />
+                    </span>
+                  </div>
+                  <div
+                    className="d-flex justify-content-center align-items-center"
+                    style={{ height: "100%" }}>
+                    <FontAwesomeIcon
+                      style={{ fontSize: "30px" }}
+                      icon={faFile}
+                    />
+                  </div>
+                </Card>
+              </OverlayTrigger>
             </Col>
           );
         })}
