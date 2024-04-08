@@ -18,7 +18,7 @@ export const NewFile = (props) => {
     }
     formData.append("multipartFile", fileInput.current.files[0]);
     formData.append("fileName", fileName);
-    if (fileName == "") {
+    if (fileName === "") {
       const newFileName = fileInput.current.files[0].name;
 
       formData.set("fileName", newFileName);
