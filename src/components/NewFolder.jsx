@@ -7,7 +7,6 @@ export const NewFolder = (props) => {
   const [folderDescription, setFolderDescription] = useState("");
 
   const parentFolderId = props.currentFolderId;
-  console.log(parentFolderId);
 
   const addFolder = async () => {
     const folderService = new FolderService();
@@ -18,7 +17,6 @@ export const NewFolder = (props) => {
     };
     try {
       const response = await folderService.addFolder(data);
-      console.log("executed");
       if (response.ok) {
         props.showSuccessModal("Folder Added Successfully");
         props.showNewFolderModal(false);
