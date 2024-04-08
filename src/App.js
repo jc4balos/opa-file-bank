@@ -4,6 +4,7 @@ import "./App.css";
 import { ErrorModal } from "./components/ErrorModal";
 import { InfoModal } from "./components/InfoModal";
 import { SuccessModal } from "./components/SuccessModal";
+import { Admin } from "./pages/Admin";
 import { Dashboard } from "./pages/Dashboard";
 import { Login } from "./pages/Login";
 
@@ -55,6 +56,26 @@ function App() {
           path="/dashboard"
           element={
             <Dashboard
+              showSuccessModal={showSuccessModal}
+              showErrorModal={showErrorModal}
+              showInfoModal={showInfoModal}
+              userId={userId}
+              accessLevelId={accessLevelId}
+              userFullName={userFullName}
+              userName={userName}
+              userTitle={userTitle}
+              setUserFullName={setUserFullName}
+              setUserName={setUserName}
+              setUserTitle={setUserTitle}
+              setAccessLevelId={setAccessLevelId}
+              setUserId={setUserId}
+            />
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <Admin
               showSuccessModal={showSuccessModal}
               showErrorModal={showErrorModal}
               showInfoModal={showInfoModal}

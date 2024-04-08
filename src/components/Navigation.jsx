@@ -25,13 +25,17 @@ export const Navigation = () => {
           alt="logo"
           style={{ height: "40px" }}
           className="pe-lg-3 p-1"></img>
-        <Navbar.Brand href="#home">
+        <Navbar.Brand href="/dashboard">
           <span>OPA File Bank</span>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="#home">Home</Nav.Link>
+            <Nav.Link href="/dashboard">Dashboard</Nav.Link>
+            <Nav.Link href="/">Admin</Nav.Link>
+
+            <Nav.Link href="/">About</Nav.Link>
+
             <Nav.Link className="d-lg-none">Profile</Nav.Link>
 
             {sessionId && (
