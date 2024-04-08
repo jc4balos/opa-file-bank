@@ -16,4 +16,18 @@ export class FileService {
       return error;
     }
   }
+
+  async downloadFile(fileId) {
+    try {
+      const url = new URL(backendUrl + "/api/v1/file/download-file");
+      url.search = new URLSearchParams({ fileId: fileId });
+      const response = await fetch(url, {
+        method: "GET",
+        credentials: "include",
+      });
+      return response;
+    } catch (error) {
+      return error;
+    }
+  }
 }

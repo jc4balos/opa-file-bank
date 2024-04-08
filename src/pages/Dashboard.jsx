@@ -13,6 +13,7 @@ import {
   Card,
   Col,
   Container,
+  Dropdown,
   Form,
   ListGroup,
   OverlayTrigger,
@@ -27,19 +28,16 @@ import { NewFile } from "../components/NewFile";
 import { NewFolder } from "../components/NewFolder";
 import { BasicSpinner } from "../components/Spinners";
 import "../css/dashboard.css";
+import { FileService } from "../service/FileService";
 import { FolderService } from "../service/FolderService";
 import { SessionService } from "../service/SessionService";
 
 export const Dashboard = (props) => {
   const [isLoading, setIsLoading] = useState(true); // Add this line
-
   const [currentFolderId, setCurrentFolderId] = useState(1);
-
   const [folderDirectory, setFolderDirectory] = useState([]);
-
   const [files, setFiles] = useState([]);
-  const [folders, setFolders] = useState([]); //search this
-
+  const [folders, setFolders] = useState([]);
   const location = useLocation();
 
   useEffect(() => {
@@ -262,6 +260,23 @@ const MainNavigation = (props) => {
 };
 
 const Content = (props) => {
+  const downloadFile = (fileId, fileName) => {
+    const fileService = new FileService();
+    fileService.downloadFile(fileId).then((response) => {
+      if (response.status === 200) {
+        response.blob().then((blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = fileName;
+          a.click();
+        });
+      } else {
+        props.showErrorModal("Failed to download file");
+      }
+    });
+  };
+
   return (
     <div>
       {props.folders.length == 0 && props.files.length == 0 && (
@@ -295,9 +310,23 @@ const Content = (props) => {
                     <span className="text-truncate">
                       <FontAwesomeIcon icon={faFolder} /> {folder.folderName}
                     </span>
-                    <span className="p-2 ellipsis-v rounded">
-                      <FontAwesomeIcon icon={faEllipsisV} />
-                    </span>
+                    <Dropdown>
+                      <Dropdown.Toggle
+                        className="p-2 ellipsis-v rounded"
+                        id="dropdown-basic">
+                        <FontAwesomeIcon icon={faEllipsisV} />
+                      </Dropdown.Toggle>
+
+                      <Dropdown.Menu>
+                        <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
+                        <Dropdown.Item href="#/action-2">
+                          Another action
+                        </Dropdown.Item>
+                        <Dropdown.Item href="#/action-3">
+                          Something else
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
                   </div>
                 </Card>
               </OverlayTrigger>
@@ -320,6 +349,12 @@ const Content = (props) => {
                   </Tooltip>
                 }>
                 <Card
+                  onDoubleClick={() => {
+                    downloadFile(
+                      file.fileId,
+                      file.fileName + "." + file.fileType
+                    );
+                  }}
                   className="zoom-on-hover bg-light p-2 m-1 "
                   style={{ height: "200px" }}>
                   <div

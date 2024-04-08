@@ -5,7 +5,6 @@
 }
 
 .zoom-on-hover:hover {
-  transform: scale(1.05);
   cursor: pointer;
   color: var(--bs-secondary);
 }
