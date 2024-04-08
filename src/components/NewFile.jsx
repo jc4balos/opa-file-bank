@@ -68,7 +68,10 @@ export const NewFile = (props) => {
                 type="file"></Form.Control>
             </Form.Group>
             <Form.Group className="mb-3" controlId="folderName">
-              <Form.Label>Custom File Name</Form.Label>
+              <Form.Label>
+                Custom File Name{" "}
+                <small className="font-italic">(Optional)</small>
+              </Form.Label>
               <Form.Control
                 type="text"
                 name="fileName"

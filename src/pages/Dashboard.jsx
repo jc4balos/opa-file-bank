@@ -262,7 +262,12 @@ const Content = (props) => {
             <Col lg="3" md="4" sm="6" xs="6" key={folder.folderId}>
               <OverlayTrigger
                 placement="bottom"
-                overlay={<Tooltip>{folder.folderDescription}</Tooltip>}>
+                overlay={
+                  <Tooltip className="d-flex flex-column">
+                    <div className="fw-bold"> {folder.folderName}</div>
+                    <div>{folder.folderDescription}</div>
+                  </Tooltip>
+                }>
                 <Card
                   onDoubleClick={() => {
                     console.log("executed");
@@ -294,7 +299,13 @@ const Content = (props) => {
             <Col lg="3" md="4" sm="6" xs="6" key={file.fileId}>
               <OverlayTrigger
                 placement="bottom"
-                overlay={<Tooltip>{file.description}</Tooltip>}>
+                overlay={
+                  <Tooltip>
+                    {" "}
+                    <div className="fw-bold"> {file.fileName}</div>
+                    <div>{file.description}</div>
+                  </Tooltip>
+                }>
                 <Card
                   className="zoom-on-hover bg-light p-2 m-1 "
                   style={{ height: "200px" }}>
