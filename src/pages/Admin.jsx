@@ -2,12 +2,15 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect } from "react";
 import {
+  Button,
   Col,
   Container,
   ListGroup,
   ProgressBar,
   Row,
   Stack,
+  Tab,
+  Tabs,
 } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import { Navigation } from "../components/Navigation";
@@ -53,7 +56,9 @@ export const Admin = (props) => {
               userTitle={props.userTitle}
             />
           </Col>
-          <Col lg="10"></Col>
+          <Col lg="10">
+            <AdminNavigation />
+          </Col>
         </Row>
       </Container>
     </div>
@@ -76,6 +81,35 @@ const SideNavAdmin = (props) => {
           <FontAwesomeIcon icon={faTrash} /> Trash
         </ListGroup.Item>
       </ListGroup>
+    </Stack>
+  );
+};
+
+const AdminNavigation = () => {
+  return (
+    <Tabs defaultActiveKey="users" id="admin-navigation" className="mb-3 mt-3">
+      <Tab eventKey="users" title="Users">
+        <UsersContentAdmin />
+      </Tab>
+      <Tab eventKey="accessLevels" title="Access Levels">
+        Tab content for Profile
+      </Tab>
+      <Tab eventKey="trashFiles" title="Trash Files">
+        Tab content for Contact
+      </Tab>
+    </Tabs>
+  );
+};
+
+const UsersContentAdmin = () => {
+  return (
+    <Stack>
+      <h4 className="fw-bold">Users</h4>
+      <p>Manage users and their access levels</p>
+
+      <div>
+        <Button>Add User</Button>
+      </div>
     </Stack>
   );
 };
