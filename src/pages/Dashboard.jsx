@@ -18,12 +18,14 @@ import {
   Stack,
   Tooltip,
 } from "react-bootstrap";
+import { useLocation } from "react-router-dom";
 import { Navigation } from "../components/Navigation";
 import { NewFile } from "../components/NewFile";
 import { NewFolder } from "../components/NewFolder";
 import { BasicSpinner } from "../components/Spinners";
 import "../css/dashboard.css";
 import { FolderService } from "../service/FolderService";
+import { SessionService } from "../service/SessionService";
 
 export const Dashboard = (props) => {
   const [isLoading, setIsLoading] = useState(true); // Add this line
@@ -34,6 +36,32 @@ export const Dashboard = (props) => {
 
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]); //search this
+
+  const location = useLocation();
+
+  useEffect(() => {
+    const fetchSessionData = async () => {
+      const sessionService = new SessionService();
+      const response = await sessionService.getSessionData();
+
+      if (response.status !== 200 && location.pathname !== "/login") {
+        const data = await response.json();
+        props.showErrorModal(data.message);
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 3000);
+      } else {
+        const data = await response.json();
+        props.setUserFullName(data.userFullName);
+        props.setUserName(data.userName);
+        props.setUserTitle(data.userTitle);
+        props.setAccessLevelId(data.accessLevelId);
+        props.setUserId(data.userId);
+      }
+    };
+
+    fetchSessionData();
+  }, []);
 
   useEffect(() => {
     if (props.userId) {

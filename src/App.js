@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { ErrorModal } from "./components/ErrorModal";
@@ -6,7 +6,6 @@ import { InfoModal } from "./components/InfoModal";
 import { SuccessModal } from "./components/SuccessModal";
 import { Dashboard } from "./pages/Dashboard";
 import { Login } from "./pages/Login";
-import { SessionService } from "./service/SessionService";
 
 function App() {
   const [errorModalState, setErrorModalState] = useState(false);
@@ -24,27 +23,6 @@ function App() {
   const [userTitle, setUserTitle] = useState("");
   const [userId, setUserId] = useState(null);
   const [accessLevelId, setAccessLevelId] = useState(null);
-
-  useEffect(() => {
-    const fetchSessionData = async () => {
-      const sessionService = new SessionService();
-      const response = await sessionService.getSessionData();
-
-      if (response.status === 200) {
-        const data = await response.json();
-        setUserFullName(data.userFullName);
-        setUserName(data.userName);
-        setUserTitle(data.userTitle);
-        setAccessLevelId(data.accessLevelId);
-        setUserId(data.userId);
-      } else {
-        const data = await response.json();
-        showErrorModal(data.message);
-      }
-    };
-
-    fetchSessionData();
-  }, []);
 
   const showSuccessModal = (message) => {
     setSuccessData(message);
@@ -85,6 +63,11 @@ function App() {
               userFullName={userFullName}
               userName={userName}
               userTitle={userTitle}
+              setUserFullName={setUserFullName}
+              setUserName={setUserName}
+              setUserTitle={setUserTitle}
+              setAccessLevelId={setAccessLevelId}
+              setUserId={setUserId}
             />
           }
         />
