@@ -3,6 +3,7 @@ import {
   faFile,
   faFolder,
   faPlus,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
@@ -13,7 +14,9 @@ import {
   Col,
   Container,
   Form,
+  ListGroup,
   OverlayTrigger,
+  ProgressBar,
   Row,
   Stack,
   Tooltip,
@@ -170,6 +173,17 @@ const SideNav = (props) => {
       <span className="fw-bold text-center">{props.userFullName}</span>
       <small className="text-center">{props.userTitle}</small>
       <small className="text-muted text-center">@{props.userName}</small>
+
+      <ListGroup as="ul" className="mt-3">
+        <ListGroup.Item as="li" className="text-center">
+          <span className="fw-bold">Storage</span>
+          <ProgressBar now={60} label={`60%`} />
+          <small>60MB of 1024MB</small>
+        </ListGroup.Item>
+        <ListGroup.Item as="li">
+          <FontAwesomeIcon icon={faTrash} /> Trash
+        </ListGroup.Item>
+      </ListGroup>
     </Stack>
   );
 };
@@ -270,7 +284,6 @@ const Content = (props) => {
                 }>
                 <Card
                   onDoubleClick={() => {
-                    console.log("executed");
                     props.handleFolderClick(folder.folderId);
                     props.addFolderOnDirectory(
                       folder.folderId,
