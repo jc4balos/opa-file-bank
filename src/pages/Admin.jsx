@@ -1,6 +1,6 @@
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Col,
@@ -15,6 +15,7 @@ import {
 import { useLocation } from "react-router-dom";
 import { Navigation } from "../components/Navigation";
 import { SessionService } from "../service/SessionService";
+import { UserService } from "../service/UserService";
 export const Admin = (props) => {
   const location = useLocation();
 
@@ -57,7 +58,7 @@ export const Admin = (props) => {
             />
           </Col>
           <Col lg="10">
-            <AdminNavigation />
+            <AdminNavigation showErrorModal={props.showErrorModal} />
           </Col>
         </Row>
       </Container>
@@ -85,11 +86,11 @@ const SideNavAdmin = (props) => {
   );
 };
 
-const AdminNavigation = () => {
+const AdminNavigation = (props) => {
   return (
     <Tabs defaultActiveKey="users" id="admin-navigation" className="mb-3 mt-3">
       <Tab eventKey="users" title="Users">
-        <UsersContentAdmin />
+        <UsersContentAdmin showErrorModal={props.showErrorModal} />
       </Tab>
       <Tab eventKey="accessLevels" title="Access Levels">
         Tab content for Profile
@@ -101,7 +102,23 @@ const AdminNavigation = () => {
   );
 };
 
-const UsersContentAdmin = () => {
+const UsersContentAdmin = (props) => {
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const userService = new UserService();
+      const response = await userService.getAllUsers();
+      if (response.status === 200) {
+        const data = await response.json();
+        setUsers(data);
+      } else {
+        const data = await response.json();
+        props.showErrorModal(data.message);
+      }
+    };
+    fetchUsers();
+  }, [users]);
+
   return (
     <Stack>
       <h4 className="fw-bold">Users</h4>
@@ -110,6 +127,29 @@ const UsersContentAdmin = () => {
       <div>
         <Button>Add User</Button>
       </div>
+      <ListGroup className="mt-3">
+        {users.map((user) => {
+          return (
+            <ListGroup.Item
+              className="d-flex justify-content-between"
+              key={user.userId}>
+              <div className="d-flex flex-column">
+                <span className="fw-bold">
+                  {user.firstName} {user.middleName} {user.lastName}
+                </span>
+                <small>{user.title}</small>
+                <span>Insert Access Level Name here</span>
+              </div>
+              <div className=" d-flex justify-content-end">
+                <div className="align-items-center d-flex gap-1">
+                  <Button variant="secondary">Edit</Button>
+                  <Button variant="danger">Delete</Button>
+                </div>
+              </div>
+            </ListGroup.Item>
+          );
+        })}
+      </ListGroup>
     </Stack>
   );
 };
