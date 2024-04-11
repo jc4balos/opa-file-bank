@@ -17,4 +17,21 @@ export class UserService {
       return error;
     }
   }
+
+  async modifyUser(data) {
+    try {
+      const url = new URL(backendUrl + "/api/v1/user/modify-user");
+
+      const response = await fetch(url, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: data,
+      });
+
+      return response;
+    } catch (error) {
+      return error;
+    }
+  }
 }
