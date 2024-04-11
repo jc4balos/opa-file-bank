@@ -112,23 +112,25 @@ const UsersContentAdmin = (props) => {
   const [userLastName, setUserLastName] = useState("");
   const [userTitle, setUserTitle] = useState("");
   const [userAccessLevelId, setUserAccessLevelId] = useState(null);
+  const [userId, setUserId] = useState(null);
 
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      const userService = new UserService();
-      const response = await userService.getAllUsers();
-      if (response.status === 200) {
-        const data = await response.json();
-        setUsers(data);
-      } else {
-        const data = await response.json();
-        props.showErrorModal(data.message);
-      }
-    };
     fetchUsers();
-  }, [users]);
+  }, []);
+
+  const fetchUsers = async () => {
+    const userService = new UserService();
+    const response = await userService.getAllUsers();
+    if (response.status === 200) {
+      const data = await response.json();
+      setUsers(data);
+    } else {
+      const data = await response.json();
+      props.showErrorModal(data.message);
+    }
+  };
 
   const closeUserEditModal = () => {
     setUserEditModalState(false);
@@ -143,10 +145,17 @@ const UsersContentAdmin = (props) => {
           closeUserEditModal={closeUserEditModal}
           showUserEditModal={userEditModalState}
           userFirstName={userFirstName}
+          setUserFirstName={setUserFirstName}
           userMiddleName={userMiddleName}
+          setUserMiddleName={setUserMiddleName}
           userLastName={userLastName}
+          setUserLastName={setUserLastName}
           userTitle={userTitle}
+          setUserTitle={setUserTitle}
           userAccessLevelId={userAccessLevelId}
+          setUserAccesslevelId={setUserAccessLevelId}
+          userId={userId}
+          setUserId={setUserId}
         />
       )}
       <Stack>
@@ -180,6 +189,7 @@ const UsersContentAdmin = (props) => {
                         setUserLastName(user.lastName);
                         setUserTitle(user.title);
                         setUserAccessLevelId(user.accessLevelId);
+                        setUserId(user.userId);
                         setUserEditModalState(true);
                       }}
                     />{" "}
