@@ -1,5 +1,4 @@
 import {
-  faEllipsisV,
   faFile,
   faFolder,
   faPlus,
@@ -13,6 +12,7 @@ import {
   Card,
   Col,
   Container,
+  Dropdown,
   Form,
   ListGroup,
   OverlayTrigger,
@@ -27,19 +27,16 @@ import { NewFile } from "../components/NewFile";
 import { NewFolder } from "../components/NewFolder";
 import { BasicSpinner } from "../components/Spinners";
 import "../css/dashboard.css";
+import { FileService } from "../service/FileService";
 import { FolderService } from "../service/FolderService";
 import { SessionService } from "../service/SessionService";
 
 export const Dashboard = (props) => {
   const [isLoading, setIsLoading] = useState(true); // Add this line
-
   const [currentFolderId, setCurrentFolderId] = useState(1);
-
   const [folderDirectory, setFolderDirectory] = useState([]);
-
   const [files, setFiles] = useState([]);
-  const [folders, setFolders] = useState([]); //search this
-
+  const [folders, setFolders] = useState([]);
   const location = useLocation();
 
   useEffect(() => {
@@ -150,6 +147,8 @@ export const Dashboard = (props) => {
               userId={props.userId}
               currentFolderId={currentFolderId}
               showErrorModal={props.showErrorModal}
+              showSuccessModal={props.showSuccessModal}
+              fetchFilesAndFolders={fetchFilesAndFolders}
               setCurrentFolderId={setCurrentFolderId}
               addFolderOnDirectory={addFolderOnDirectory}
               resetDirectory={resetDirectory}
@@ -262,6 +261,35 @@ const MainNavigation = (props) => {
 };
 
 const Content = (props) => {
+  const downloadFile = (fileId, fileName) => {
+    const fileService = new FileService();
+    fileService.downloadFile(fileId).then((response) => {
+      if (response.status === 200) {
+        response.blob().then((blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = fileName;
+          a.click();
+        });
+      } else {
+        props.showErrorModal("Failed to download file");
+      }
+    });
+  };
+
+  const deleteFile = (fileId) => {
+    const fileService = new FileService();
+    fileService.deleteFile(fileId).then((response) => {
+      if (response.status === 200) {
+        props.showSuccessModal("File Deleted Successfully");
+        props.fetchFilesAndFolders();
+      } else {
+        props.showErrorModal("Failed to delete file");
+      }
+    });
+  };
+
   return (
     <div>
       {props.folders.length == 0 && props.files.length == 0 && (
@@ -275,7 +303,7 @@ const Content = (props) => {
           return (
             <Col lg="3" md="4" sm="6" xs="6" key={folder.folderId}>
               <OverlayTrigger
-                placement="bottom"
+                placement="left"
                 overlay={
                   <Tooltip className="d-flex flex-column">
                     <div className="fw-bold"> {folder.folderName}</div>
@@ -295,9 +323,6 @@ const Content = (props) => {
                     <span className="text-truncate">
                       <FontAwesomeIcon icon={faFolder} /> {folder.folderName}
                     </span>
-                    <span className="p-2 ellipsis-v rounded">
-                      <FontAwesomeIcon icon={faEllipsisV} />
-                    </span>
                   </div>
                 </Card>
               </OverlayTrigger>
@@ -311,17 +336,14 @@ const Content = (props) => {
           return (
             <Col lg="3" md="4" sm="6" xs="6" key={file.fileId}>
               <OverlayTrigger
-                placement="bottom"
+                placement="left"
                 overlay={
                   <Tooltip>
-                    {" "}
                     <div className="fw-bold"> {file.fileName}</div>
                     <div>{file.description}</div>
                   </Tooltip>
                 }>
-                <Card
-                  className="zoom-on-hover bg-light p-2 m-1 "
-                  style={{ height: "200px" }}>
+                <Card className="bg-light p-2 m-1 " style={{ height: "200px" }}>
                   <div
                     className="align-items-top d-flex justify-content-between"
                     style={{ width: "100%" }}>
@@ -332,14 +354,43 @@ const Content = (props) => {
                       <span>.{file.fileType}</span>
                     </div>
 
-                    <span className="p-2 ellipsis-v rounded">
-                      <FontAwesomeIcon icon={faEllipsisV} />
-                    </span>
+                    <Dropdown className="ellipsis-v rounded ms-1">
+                      <Dropdown.Toggle
+                        variant="none"
+                        className="p-2 rounded custom-dropdown-toggle"
+                        id="dropdown-basic"></Dropdown.Toggle>
+
+                      <Dropdown.Menu>
+                        <Dropdown.Item
+                          onClick={() => {
+                            downloadFile(
+                              file.fileId,
+                              file.fileName + "." + file.fileType
+                            );
+                          }}>
+                          Download
+                        </Dropdown.Item>
+                        <Dropdown.Item>Modify Permissions</Dropdown.Item>
+                        <Dropdown.Item
+                          onClick={() => {
+                            deleteFile(file.fileId);
+                          }}>
+                          Delete{" "}
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
                   </div>
                   <div
                     className="d-flex justify-content-center align-items-center"
                     style={{ height: "100%" }}>
                     <FontAwesomeIcon
+                      className="zoom-on-hover "
+                      onClick={() => {
+                        downloadFile(
+                          file.fileId,
+                          file.fileName + "." + file.fileType
+                        );
+                      }}
                       style={{ fontSize: "30px" }}
                       icon={faFile}
                     />
