@@ -26,7 +26,7 @@ import { Navigation } from "../components/Navigation";
 import { NewFile } from "../components/NewFile";
 import { NewFolder } from "../components/NewFolder";
 import { BasicSpinner } from "../components/Spinners";
-import "../css/dashboard.css";
+import "../css/global.css";
 import { FileService } from "../service/FileService";
 import { FolderService } from "../service/FolderService";
 import { SessionService } from "../service/SessionService";
@@ -47,9 +47,9 @@ export const Dashboard = (props) => {
       if (response.status !== 200 && location.pathname !== "/login") {
         const data = await response.json();
         props.showErrorModal(data.message);
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 3000);
+        // setTimeout(() => {
+        //   window.location.href = "/login";
+        // }, 3000);
       } else {
         const data = await response.json();
         props.setUserFullName(data.userFullName);
@@ -57,6 +57,7 @@ export const Dashboard = (props) => {
         props.setUserTitle(data.userTitle);
         props.setAccessLevelId(data.accessLevelId);
         props.setUserId(data.userId);
+        console.log(data);
       }
     };
 

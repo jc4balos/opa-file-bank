@@ -14,9 +14,9 @@ export class SessionService {
       });
       return response;
     } catch (error) {
-      setTimeout(() => {
-        window.location = "/login";
-      }, 2000);
+      // setTimeout(() => {
+      //   window.location = "/login";
+      // }, 2000);
       return error;
     }
   }

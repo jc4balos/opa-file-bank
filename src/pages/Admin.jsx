@@ -113,6 +113,7 @@ const UsersContentAdmin = (props) => {
   const [userTitle, setUserTitle] = useState("");
   const [userAccessLevelId, setUserAccessLevelId] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [userPassword, setUserPassword] = useState("");
 
   const [users, setUsers] = useState([]);
 
@@ -156,6 +157,8 @@ const UsersContentAdmin = (props) => {
           setUserAccesslevelId={setUserAccessLevelId}
           userId={userId}
           setUserId={setUserId}
+          userPassword={userPassword}
+          setUserPassword={setUserPassword}
         />
       )}
       <Stack>
@@ -190,6 +193,7 @@ const UsersContentAdmin = (props) => {
                         setUserTitle(user.title);
                         setUserAccessLevelId(user.accessLevelId);
                         setUserId(user.userId);
+                        setUserPassword(user.password);
                         setUserEditModalState(true);
                       }}
                     />{" "}
