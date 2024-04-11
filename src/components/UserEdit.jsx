@@ -17,16 +17,16 @@ export const UserEdit = (props) => {
         <Modal.Body>
           <Form>
             <Form.Label>First Name</Form.Label>
-            <Form.Control type="text" />
+            <Form.Control className="mb-3" type="text" />
 
             <Form.Label>Middle Name</Form.Label>
-            <Form.Control type="text" />
+            <Form.Control className="mb-3" type="text" />
 
             <Form.Label>Last Name</Form.Label>
-            <Form.Control type="text" />
+            <Form.Control className="mb-3" type="text" />
 
             <Form.Label>Title</Form.Label>
-            <Form.Control type="text" />
+            <Form.Control className="mb-3" type="text" />
 
             <Form.Label>Access Level</Form.Label>
             <Form.Select></Form.Select>
