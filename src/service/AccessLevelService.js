@@ -1,3 +1,4 @@
+import { backendUrl } from "../config/config";
 export class AccessLevelService {
   async getAllAccessLevels() {
     try {
