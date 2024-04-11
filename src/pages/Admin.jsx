@@ -1,4 +1,4 @@
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import {
@@ -14,6 +14,8 @@ import {
 } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import { Navigation } from "../components/Navigation";
+import { UserEdit } from "../components/UserEdit";
+import "../css/global.css";
 import { SessionService } from "../service/SessionService";
 import { UserService } from "../service/UserService";
 export const Admin = (props) => {
@@ -103,7 +105,16 @@ const AdminNavigation = (props) => {
 };
 
 const UsersContentAdmin = (props) => {
+  const [userEditModalState, setUserEditModalState] = useState(false);
+
+  const [userFirstName, setUserFirstName] = useState("");
+  const [userMiddleName, setUserMiddleName] = useState("");
+  const [userLastName, setUserLastName] = useState("");
+  const [userTitle, setUserTitle] = useState("");
+  const [userAccessLevelId, setUserAccessLevelId] = useState(null);
+
   const [users, setUsers] = useState([]);
+
   useEffect(() => {
     const fetchUsers = async () => {
       const userService = new UserService();
@@ -119,37 +130,67 @@ const UsersContentAdmin = (props) => {
     fetchUsers();
   }, [users]);
 
-  return (
-    <Stack>
-      <h4 className="fw-bold">Users</h4>
-      <p>Manage users and their access levels</p>
+  const closeUserEditModal = () => {
+    setUserEditModalState(false);
+  };
 
-      <div>
-        <Button>Add User</Button>
-      </div>
-      <ListGroup className="mt-3">
-        {users.map((user) => {
-          return (
-            <ListGroup.Item
-              className="d-flex justify-content-between"
-              key={user.userId}>
-              <div className="d-flex flex-column">
-                <span className="fw-bold">
-                  {user.firstName} {user.middleName} {user.lastName}
-                </span>
-                <small>{user.title}</small>
-                <span>Insert Access Level Name here</span>
-              </div>
-              <div className=" d-flex justify-content-end">
-                <div className="align-items-center d-flex gap-1">
-                  <Button variant="secondary">Edit</Button>
-                  <Button variant="danger">Delete</Button>
+  return (
+    <div>
+      {userEditModalState && (
+        <UserEdit
+          showErrorModal={props.showErrorModal}
+          showSuccessModal={props.showSuccessModal}
+          closeUserEditModal={closeUserEditModal}
+          showUserEditModal={userEditModalState}
+          userFirstName={userFirstName}
+          userMiddleName={userMiddleName}
+          userLastName={userLastName}
+          userTitle={userTitle}
+          userAccessLevelId={userAccessLevelId}
+        />
+      )}
+      <Stack>
+        <h4 className="fw-bold">Users</h4>
+        <p>Manage users and their access levels</p>
+
+        <div>
+          <Button>Add User</Button>
+        </div>
+        <ListGroup className="mt-3">
+          {users.map((user) => {
+            return (
+              <ListGroup.Item
+                className="d-flex justify-content-between"
+                key={user.userId}>
+                <div className="d-flex flex-column">
+                  <span className="fw-bold">
+                    {user.firstName} {user.middleName} {user.lastName}
+                  </span>
+                  <small className="text-muted">{user.title}</small>
+                  <span>Insert Access Level Name here</span>
                 </div>
-              </div>
-            </ListGroup.Item>
-          );
-        })}
-      </ListGroup>
-    </Stack>
+                <div className=" d-flex justify-content-end">
+                  <div className="align-items-center d-flex gap-3">
+                    <FontAwesomeIcon
+                      className="zoom-on-hover"
+                      icon={faEdit}
+                      onClick={() => {
+                        setUserFirstName(user.firstName);
+                        setUserMiddleName(user.middleName);
+                        setUserLastName(user.lastName);
+                        setUserTitle(user.title);
+                        setUserAccessLevelId(user.accessLevelId);
+                        setUserEditModalState(true);
+                      }}
+                    />{" "}
+                    <FontAwesomeIcon className="zoom-on-hover" icon={faTrash} />{" "}
+                  </div>
+                </div>
+              </ListGroup.Item>
+            );
+          })}
+        </ListGroup>
+      </Stack>
+    </div>
   );
 };
