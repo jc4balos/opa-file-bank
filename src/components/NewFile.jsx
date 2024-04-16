@@ -20,8 +20,12 @@ export const NewFile = (props) => {
     formData.append("fileName", fileName);
     if (fileName === "") {
       const newFileName = fileInput.current.files[0].name;
+      const formattedFileName = newFileName.substr(
+        0,
+        newFileName.lastIndexOf(".")
+      );
 
-      formData.set("fileName", newFileName);
+      formData.set("fileName", formattedFileName);
     }
 
     formData.append("description", fileDescription);
