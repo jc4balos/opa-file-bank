@@ -1,9 +1,4 @@
-import {
-  faFile,
-  faFolder,
-  faPlus,
-  faTrash,
-} from "@fortawesome/free-solid-svg-icons";
+import { faFile, faFolder, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import {
@@ -11,26 +6,22 @@ import {
   Button,
   Card,
   Col,
-  Container,
   Dropdown,
   Form,
-  ListGroup,
   OverlayTrigger,
-  ProgressBar,
   Row,
-  Stack,
   Tooltip,
 } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import { Navigation } from "../components/Navigation";
 import { NewFile } from "../components/NewFile";
 import { NewFolder } from "../components/NewFolder";
+import { SideNav } from "../components/SideNav";
 import { BasicSpinner } from "../components/Spinners";
 import "../css/global.css";
 import { FileService } from "../service/FileService";
 import { FolderService } from "../service/FolderService";
 import { SessionService } from "../service/SessionService";
-import { StorageService } from "../service/StorageService";
 
 export const Dashboard = (props) => {
   const [isLoading, setIsLoading] = useState(true); // Add this line
@@ -116,7 +107,7 @@ export const Dashboard = (props) => {
   return (
     <div>
       <Navigation />
-      <Container>
+      <div className="m-lg-3 m-1">
         <Row>
           <Col className="d-none d-lg-flex" lg="2">
             <SideNav
@@ -165,64 +156,8 @@ export const Dashboard = (props) => {
             />
           </Col>
         </Row>
-      </Container>
+      </div>
     </div>
-  );
-};
-
-const SideNav = (props) => {
-  const [storages, setStorages] = useState([]);
-
-  useEffect(() => {
-    fetchStorageInfo();
-  });
-
-  const fetchStorageInfo = async () => {
-    const storageService = new StorageService();
-    const response = await storageService.getStorageInfo();
-    if (response.status === 200) {
-      const data = await response.json();
-      setStorages(data);
-    } else {
-      const data = await response.json();
-      props.showErrorModal(data);
-    }
-  };
-
-  return (
-    <Stack className="">
-      <span className="fw-bold text-center">{props.userFullName}</span>
-      <small className="text-center">{props.userTitle}</small>
-      <small className="text-muted text-center">@{props.userName}</small>
-
-      <ListGroup as="ul" className="mt-3">
-        {storages.map((storage, index) => {
-          return (
-            <ListGroup.Item
-              as="li"
-              className="text-center d-flex flex-column"
-              key={index}>
-              <span className="fw-bold">{storage.driveName}</span>
-              <ProgressBar
-                now={storage.storagePercentageAllocation}
-                label={storage.storagePercentageAllocation + "%"}
-              />
-              <small className="text-muted">
-                {storage.currentStorageAllocation} GB of{" "}
-                {storage.maxStorageAllocation} GB <b>used</b>
-              </small>
-              <small>
-                <b>Free</b> {storage.freeStorageAllocation} GB
-              </small>
-            </ListGroup.Item>
-          );
-        })}
-
-        <ListGroup.Item as="li">
-          <FontAwesomeIcon icon={faTrash} /> Trash
-        </ListGroup.Item>
-      </ListGroup>
-    </Stack>
   );
 };
 
