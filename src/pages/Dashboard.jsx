@@ -30,6 +30,7 @@ import "../css/global.css";
 import { FileService } from "../service/FileService";
 import { FolderService } from "../service/FolderService";
 import { SessionService } from "../service/SessionService";
+import { StorageService } from "../service/StorageService";
 
 export const Dashboard = (props) => {
   const [isLoading, setIsLoading] = useState(true); // Add this line
@@ -47,9 +48,9 @@ export const Dashboard = (props) => {
       if (response.status !== 200 && location.pathname !== "/login") {
         const data = await response.json();
         props.showErrorModal(data.message);
-        // setTimeout(() => {
-        //   window.location.href = "/login";
-        // }, 3000);
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 3000);
       } else {
         const data = await response.json();
         props.setUserFullName(data.userFullName);
@@ -124,6 +125,8 @@ export const Dashboard = (props) => {
               userFullName={props.userFullName}
               userName={props.userName}
               userTitle={props.userTitle}
+              showErrorModal={props.showErrorModal}
+              showSuccessModal={props.showSuccessModal}
             />
           </Col>
           <Col lg="10">
@@ -168,6 +171,24 @@ export const Dashboard = (props) => {
 };
 
 const SideNav = (props) => {
+  const [storages, setStorages] = useState([]);
+
+  useEffect(() => {
+    fetchStorageInfo();
+  });
+
+  const fetchStorageInfo = async () => {
+    const storageService = new StorageService();
+    const response = await storageService.getStorageInfo();
+    if (response.status === 200) {
+      const data = await response.json();
+      setStorages(data);
+    } else {
+      const data = await response.json();
+      props.showErrorModal(data);
+    }
+  };
+
   return (
     <Stack className="">
       <span className="fw-bold text-center">{props.userFullName}</span>
@@ -175,11 +196,28 @@ const SideNav = (props) => {
       <small className="text-muted text-center">@{props.userName}</small>
 
       <ListGroup as="ul" className="mt-3">
-        <ListGroup.Item as="li" className="text-center">
-          <span className="fw-bold">Storage</span>
-          <ProgressBar now={60} label={`60%`} />
-          <small>60MB of 1024MB</small>
-        </ListGroup.Item>
+        {storages.map((storage, index) => {
+          return (
+            <ListGroup.Item
+              as="li"
+              className="text-center d-flex flex-column"
+              key={index}>
+              <span className="fw-bold">{storage.driveName}</span>
+              <ProgressBar
+                now={storage.storagePercentageAllocation}
+                label={storage.storagePercentageAllocation + "%"}
+              />
+              <small className="text-muted">
+                {storage.currentStorageAllocation} GB of{" "}
+                {storage.maxStorageAllocation} GB <b>used</b>
+              </small>
+              <small>
+                <b>Free</b> {storage.freeStorageAllocation} GB
+              </small>
+            </ListGroup.Item>
+          );
+        })}
+
         <ListGroup.Item as="li">
           <FontAwesomeIcon icon={faTrash} /> Trash
         </ListGroup.Item>
@@ -293,13 +331,13 @@ const Content = (props) => {
 
   return (
     <div>
-      {props.folders.length == 0 && props.files.length == 0 && (
+      {props.folders.length === 0 && props.files.length === 0 && (
         <div className="d-flex justify-content-center align-items-center">
           This folder is empty.
         </div>
       )}
       <Row>
-        {props.folders.length != 0 && <span>Folders</span>}
+        {props.folders.length !== 0 && <span>Folders</span>}
         {props.folders.map((folder) => {
           return (
             <Col lg="3" md="4" sm="6" xs="6" key={folder.folderId}>
@@ -332,7 +370,7 @@ const Content = (props) => {
         })}
       </Row>
       <Row>
-        {props.files.length != 0 && <span>Files</span>}
+        {props.files.length !== 0 && <span>Files</span>}
         {props.files.map((file) => {
           return (
             <Col lg="3" md="4" sm="6" xs="6" key={file.fileId}>

@@ -1,9 +1,9 @@
 import { backendUrl } from "../config/config";
 
-export class SessionService {
-  async getSessionData() {
+export class StorageService {
+  async getStorageInfo() {
     try {
-      const url = new URL(backendUrl + "/api/v1/session");
+      const url = new URL(backendUrl + "/api/v1/storage/info");
 
       const response = await fetch(url, {
         method: "GET",
