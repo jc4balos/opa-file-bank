@@ -9,7 +9,7 @@ export const SideNav = (props) => {
 
   useEffect(() => {
     fetchStorageInfo();
-  });
+  }, []);
 
   const fetchStorageInfo = async () => {
     const storageService = new StorageService();

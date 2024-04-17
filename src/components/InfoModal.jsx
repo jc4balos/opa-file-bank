@@ -19,7 +19,11 @@ const InfoModal = (props) => {
           <Button variant="secondary" onClick={props.closeInfoModal}>
             Close
           </Button>
-          <Button variant="primary" onClick={props.infoModalAction}>
+          <Button
+            variant="primary"
+            onClick={() => {
+              props.infoModalAction();
+            }}>
             {props.infoModalActionText}
           </Button>
         </Modal.Footer>

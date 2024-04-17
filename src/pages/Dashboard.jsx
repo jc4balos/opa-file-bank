@@ -1,6 +1,13 @@
-import { faFile, faFolder, faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faDownload,
+  faEye,
+  faFile,
+  faFolder,
+  faPlus,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Breadcrumb,
   Button,
@@ -13,6 +20,8 @@ import {
   Tooltip,
 } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
+import { Context } from "../App";
+import { InfoModal } from "../components/InfoModal";
 import { Navigation } from "../components/Navigation";
 import { NewFile } from "../components/NewFile";
 import { NewFolder } from "../components/NewFolder";
@@ -235,6 +244,29 @@ const MainNavigation = (props) => {
 };
 
 const Content = (props) => {
+  const { infoModal } = useContext(Context);
+  const [
+    infoModalState,
+    setInfoModalState,
+    infoModalHeading,
+    setInfoModalHeading,
+    infoModalMessage,
+    setInfoModalMessage,
+    infoModalAction,
+    setInfoModalAction,
+    infoModalActionText,
+    setInfoModalActionText,
+  ] = infoModal;
+
+  const confirmDeleteFile = (onDelete) => {
+    setInfoModalHeading("Delete File");
+    setInfoModalMessage("Are you sure you want to delete this file?");
+    setInfoModalAction(() => onDelete);
+    setInfoModalActionText("Delete");
+    setInfoModalState(true);
+    console.log(infoModalState);
+  };
+
   const downloadFile = (fileId, fileName) => {
     const fileService = new FileService();
     fileService.downloadFile(fileId).then((response) => {
@@ -266,6 +298,7 @@ const Content = (props) => {
 
   return (
     <div>
+      {infoModalState && <InfoModal />}
       {props.folders.length === 0 && props.files.length === 0 && (
         <div className="d-flex justify-content-center align-items-center">
           This folder is empty.
@@ -347,7 +380,7 @@ const Content = (props) => {
                         <Dropdown.Item>Modify Permissions</Dropdown.Item>
                         <Dropdown.Item
                           onClick={() => {
-                            deleteFile(file.fileId);
+                            confirmDeleteFile(() => deleteFile(file.fileId));
                           }}>
                           Delete{" "}
                         </Dropdown.Item>
@@ -356,18 +389,61 @@ const Content = (props) => {
                   </div>
                   <div
                     className="d-flex justify-content-center align-items-center"
-                    style={{ height: "100%" }}>
+                    style={{ height: "100%" }}
+                    onMouseEnter={() => {
+                      document.querySelector(
+                        `#fileIcon_${file.fileId}`
+                      ).style.display = "none";
+                      document.querySelector(
+                        `#file_${file.fileId}`
+                      ).style.display = "flex";
+                    }}
+                    onMouseLeave={() => {
+                      document.querySelector(
+                        `#fileIcon_${file.fileId}`
+                      ).style.display = "flex";
+                      document.querySelector(
+                        `#file_${file.fileId}`
+                      ).style.display = "none";
+                    }}>
                     <FontAwesomeIcon
                       className="zoom-on-hover "
-                      onClick={() => {
-                        downloadFile(
-                          file.fileId,
-                          file.fileName + "." + file.fileType
-                        );
-                      }}
-                      style={{ fontSize: "30px" }}
+                      id={"fileIcon_" + file.fileId}
+                      style={{ fontSize: "50px" }}
                       icon={faFile}
                     />
+                    <div
+                      className="justify-content-evenly w-100"
+                      id={"file_" + file.fileId}
+                      style={{ display: "none" }}>
+                      <FontAwesomeIcon
+                        className="zoom-on-hover "
+                        style={{ fontSize: "30px" }}
+                        icon={faDownload}
+                        onClick={() => {
+                          downloadFile(
+                            file.fileId,
+                            file.fileName + "." + file.fileType
+                          );
+                        }}
+                      />
+                      <FontAwesomeIcon
+                        className="zoom-on-hover "
+                        onClick={() => {
+                          confirmDeleteFile(() => deleteFile(file.fileId));
+                        }}
+                        style={{ fontSize: "30px" }}
+                        icon={faTrash}
+                      />
+                      <FontAwesomeIcon
+                        className="zoom-on-hover "
+                        onClick={() => {
+                          //preview file
+                        }}
+                        style={{ fontSize: "30px" }}
+                        icon={faEye}
+                      />
+                    </div>
                   </div>
                 </Card>
               </OverlayTrigger>

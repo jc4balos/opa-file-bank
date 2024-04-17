@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { ErrorModal } from "./components/ErrorModal";
@@ -7,6 +7,8 @@ import { SuccessModal } from "./components/SuccessModal";
 import { Admin } from "./pages/Admin";
 import { Dashboard } from "./pages/Dashboard";
 import { Login } from "./pages/Login";
+
+export const Context = React.createContext();
 
 function App() {
   const [errorModalState, setErrorModalState] = useState(false);
@@ -35,107 +37,132 @@ function App() {
     setErrorModalState(true);
   };
 
-  const showInfoModal = (
-    infoModalHeading,
-    infoModalMessage,
-    infoModalAction,
-    infoModalActionText
-  ) => {
-    setInfoModalHeading(infoModalHeading);
-    setInfoModalMessage(infoModalMessage);
-    setInfoModalAction(() => infoModalAction);
-    setInfoModalActionText(infoModalActionText);
-    setInfoModalState(true);
-  };
-
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route
-          path="/dashboard"
-          element={
-            <Dashboard
-              showSuccessModal={showSuccessModal}
-              showErrorModal={showErrorModal}
-              showInfoModal={showInfoModal}
-              userId={userId}
-              accessLevelId={accessLevelId}
-              userFullName={userFullName}
-              userName={userName}
-              userTitle={userTitle}
-              setUserFullName={setUserFullName}
-              setUserName={setUserName}
-              setUserTitle={setUserTitle}
-              setAccessLevelId={setAccessLevelId}
-              setUserId={setUserId}
-            />
-          }
-        />
-        <Route
-          path="/admin"
-          element={
-            <Admin
-              showSuccessModal={showSuccessModal}
-              showErrorModal={showErrorModal}
-              showInfoModal={showInfoModal}
-              userId={userId}
-              accessLevelId={accessLevelId}
-              userFullName={userFullName}
-              userName={userName}
-              userTitle={userTitle}
-              setUserFullName={setUserFullName}
-              setUserName={setUserName}
-              setUserTitle={setUserTitle}
-              setAccessLevelId={setAccessLevelId}
-              setUserId={setUserId}
-            />
-          }
-        />
-        <Route
-          path="/login"
-          element={
-            <Login
-              showSuccessModal={showSuccessModal}
-              showErrorModal={showErrorModal}
-            />
-          }
-        />
-      </Routes>
+    <Context.Provider
+      value={{
+        infoModal: [
+          infoModalState,
+          setInfoModalState,
+          infoModalHeading,
+          setInfoModalHeading,
+          infoModalMessage,
+          setInfoModalMessage,
+          infoModalAction,
+          setInfoModalAction,
+          infoModalActionText,
+          setInfoModalActionText,
+        ],
+        errorModal: [
+          errorData,
+          setErrorData,
+          errorModalState,
+          setErrorModalState,
+        ],
+        successModal: [
+          successData,
+          setSuccessData,
+          successModalState,
+          setSuccessModalState,
+        ],
+        userData: [
+          userFullName,
+          userName,
+          userTitle,
+          userId,
+          accessLevelId,
+          setUserFullName,
+          setUserName,
+          setUserTitle,
+          setUserId,
+          setAccessLevelId,
+        ],
+      }}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route
+            path="/dashboard"
+            element={
+              <Dashboard
+                showSuccessModal={showSuccessModal}
+                showErrorModal={showErrorModal}
+                userId={userId}
+                accessLevelId={accessLevelId}
+                userFullName={userFullName}
+                userName={userName}
+                userTitle={userTitle}
+                setUserFullName={setUserFullName}
+                setUserName={setUserName}
+                setUserTitle={setUserTitle}
+                setAccessLevelId={setAccessLevelId}
+                setUserId={setUserId}
+              />
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <Admin
+                showSuccessModal={showSuccessModal}
+                showErrorModal={showErrorModal}
+                userId={userId}
+                accessLevelId={accessLevelId}
+                userFullName={userFullName}
+                userName={userName}
+                userTitle={userTitle}
+                setUserFullName={setUserFullName}
+                setUserName={setUserName}
+                setUserTitle={setUserTitle}
+                setAccessLevelId={setAccessLevelId}
+                setUserId={setUserId}
+              />
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <Login
+                showSuccessModal={showSuccessModal}
+                showErrorModal={showErrorModal}
+              />
+            }
+          />
+        </Routes>
 
-      {errorModalState && (
-        <ErrorModal
-          showErrorModal={errorModalState}
-          closeErrorModal={() => {
-            setErrorModalState(false);
-          }}
-          errorModalHeading={"Error"}
-          errorMessages={errorData}
-        />
-      )}
-      {successModalState && (
-        <SuccessModal
-          showSuccessModal={successModalState}
-          closeSuccessModal={() => {
-            setSuccessModalState(false);
-          }}
-          successModalHeading={"Success"}
-          successMessages={successData}
-        />
-      )}
-      {infoModalState && (
-        <InfoModal
-          showInfoModal={infoModalState}
-          closeInfoModal={() => {
-            setInfoModalState(false);
-          }}
-          infoModalHeading={infoModalHeading}
-          infoModalMessage={infoModalMessage}
-          infoModalAction={infoModalAction}
-          infoModalActionText={infoModalActionText}
-        />
-      )}
-    </BrowserRouter>
+        {errorModalState && (
+          <ErrorModal
+            showErrorModal={errorModalState}
+            closeErrorModal={() => {
+              setErrorModalState(false);
+            }}
+            errorModalHeading={"Error"}
+            errorMessages={errorData}
+          />
+        )}
+        {successModalState && (
+          <SuccessModal
+            showSuccessModal={successModalState}
+            closeSuccessModal={() => {
+              setSuccessModalState(false);
+            }}
+            successModalHeading={"Success"}
+            successMessages={successData}
+          />
+        )}
+        {infoModalState && (
+          <InfoModal
+            showInfoModal={infoModalState}
+            closeInfoModal={() => {
+              setInfoModalState(false);
+            }}
+            infoModalHeading={infoModalHeading}
+            infoModalMessage={infoModalMessage}
+            infoModalAction={infoModalAction}
+            infoModalActionText={infoModalActionText}
+          />
+        )}
+      </BrowserRouter>
+    </Context.Provider>
   );
 }
 
