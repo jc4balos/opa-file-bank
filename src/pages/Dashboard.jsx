@@ -258,6 +258,20 @@ const Content = (props) => {
     setInfoModalActionText,
   ] = infoModal;
 
+  const { previewModal } = useContext(Context);
+  const [
+    previewModalState,
+    setPreviewModalState,
+    previewBinary,
+    setPreviewBinary,
+    previewModalAction,
+    setPreviewModalAction,
+    previewFileType,
+    setPreviewFileType,
+    previewFileName,
+    setPreviewFileName,
+  ] = previewModal;
+
   const confirmDeleteFile = (onDelete) => {
     setInfoModalHeading("Delete File");
     setInfoModalMessage("Are you sure you want to delete this file?");
@@ -265,6 +279,27 @@ const Content = (props) => {
     setInfoModalActionText("Delete");
     setInfoModalState(true);
     console.log(infoModalState);
+  };
+
+  const previewFile = async (fileId, action, fileName, fileType) => {
+    const fileService = new FileService();
+    const response = await fileService.downloadFile(fileId);
+    if (response.status === 200) {
+      // const a = document.createElement("a");
+      // a.href = url;
+      const data = await response.arrayBuffer(response);
+      console.log("status 200");
+      setPreviewModalState(true);
+      setPreviewFileType(fileType);
+      setPreviewFileName(fileName);
+      setPreviewBinary(data);
+      setPreviewModalAction(() => action);
+      const blob = URL.createObjectURL(new Blob([data]));
+      console.log(data);
+    } else {
+      console.log(response.status);
+      props.showErrorModal("Failed to download file");
+    }
   };
 
   const downloadFile = (fileId, fileName) => {
@@ -438,7 +473,16 @@ const Content = (props) => {
                       <FontAwesomeIcon
                         className="zoom-on-hover "
                         onClick={() => {
-                          //preview file
+                          previewFile(
+                            file.fileId,
+                            () =>
+                              downloadFile(
+                                file.fileId,
+                                file.fileName + "." + file.fileType
+                              ),
+                            file.fileName,
+                            file.fileType
+                          );
                         }}
                         style={{ fontSize: "30px" }}
                         icon={faEye}

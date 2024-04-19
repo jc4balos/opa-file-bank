@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { ErrorModal } from "./components/ErrorModal";
 import { InfoModal } from "./components/InfoModal";
+import { PreviewFile } from "./components/Preview";
 import { SuccessModal } from "./components/SuccessModal";
 import { Admin } from "./pages/Admin";
 import { Dashboard } from "./pages/Dashboard";
@@ -16,10 +17,16 @@ function App() {
   const [successModalState, setSuccessModalState] = useState(false);
   const [successData, setSuccessData] = useState([]);
   const [infoModalState, setInfoModalState] = useState(false);
-  const [infoModalHeading, setInfoModalHeading] = useState([]);
-  const [infoModalMessage, setInfoModalMessage] = useState([]);
+  const [infoModalHeading, setInfoModalHeading] = useState("");
+  const [infoModalMessage, setInfoModalMessage] = useState("");
   const [infoModalAction, setInfoModalAction] = useState(() => {});
-  const [infoModalActionText, setInfoModalActionText] = useState([]);
+  const [infoModalActionText, setInfoModalActionText] = useState("");
+
+  const [previewModalState, setPreviewModalState] = useState(false);
+  const [previewBinary, setPreviewBinary] = useState("");
+  const [previewModalAction, setPreviewModalAction] = useState(() => {});
+  const [previewFileType, setPreviewFileType] = useState("");
+  const [previewFileName, setPreviewFileName] = useState("");
 
   const [userFullName, setUserFullName] = useState("");
   const [userName, setUserName] = useState("");
@@ -63,6 +70,18 @@ function App() {
           setSuccessData,
           successModalState,
           setSuccessModalState,
+        ],
+        previewModal: [
+          previewModalState,
+          setPreviewModalState,
+          previewBinary,
+          setPreviewBinary,
+          previewModalAction,
+          setPreviewModalAction,
+          previewFileType,
+          setPreviewFileType,
+          previewFileName,
+          setPreviewFileName,
         ],
         userData: [
           userFullName,
@@ -129,6 +148,18 @@ function App() {
           />
         </Routes>
 
+        {previewModalState && (
+          <PreviewFile
+            showPreviewModal={previewModalState}
+            closePreviewModal={() => {
+              setPreviewModalState(false);
+            }}
+            previewBinary={previewBinary}
+            previewModalAction={previewModalAction}
+            previewFileType={previewFileType}
+            previewFileName={previewFileName}
+          />
+        )}
         {errorModalState && (
           <ErrorModal
             showErrorModal={errorModalState}
