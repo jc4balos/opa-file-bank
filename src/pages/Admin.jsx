@@ -14,6 +14,7 @@ import {
 } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import { Navigation } from "../components/Navigation";
+import { UserAdd } from "../components/UserAdd";
 import { UserEdit } from "../components/UserEdit";
 import "../css/global.css";
 import { SessionService } from "../service/SessionService";
@@ -106,10 +107,12 @@ const AdminNavigation = (props) => {
 
 const UsersContentAdmin = (props) => {
   const [userEditModalState, setUserEditModalState] = useState(false);
+  const [userAddModalState, setUserAddModalState] = useState(false);
 
   const [userFirstName, setUserFirstName] = useState("");
   const [userMiddleName, setUserMiddleName] = useState("");
   const [userLastName, setUserLastName] = useState("");
+  const [userName, setUserName] = useState("");
   const [userTitle, setUserTitle] = useState("");
   const [userAccessLevelId, setUserAccessLevelId] = useState(null);
   const [userId, setUserId] = useState(null);
@@ -137,8 +140,40 @@ const UsersContentAdmin = (props) => {
     setUserEditModalState(false);
   };
 
+  const closeUserAddModal = () => {
+    setUserAddModalState(false);
+  };
+
   return (
     <div>
+      {userAddModalState && (
+        <UserAdd
+          userName={userName}
+          setUserName={setUserName}
+          showErrorModal={props.showErrorModal}
+          showSuccessModal={props.showSuccessModal}
+          closeUserAddModal={closeUserAddModal}
+          showUserAddModal={userAddModalState}
+          userFirstName={userFirstName}
+          setUserFirstName={setUserFirstName}
+          userMiddleName={userMiddleName}
+          setUserMiddleName={setUserMiddleName}
+          userLastName={userLastName}
+          setUserLastName={setUserLastName}
+          userTitle={userTitle}
+          setUserTitle={setUserTitle}
+          userId={userId}
+          setUserId={setUserId}
+          userPassword={userPassword}
+          setUserPassword={setUserPassword}
+          setUserAccessLevelId={setUserAccessLevelId}
+          userAccessLevelId={userAccessLevelId}
+          fetchUsers={() => {
+            fetchUsers();
+          }}
+        />
+      )}
+
       {userEditModalState && (
         <UserEdit
           showErrorModal={props.showErrorModal}
@@ -166,7 +201,12 @@ const UsersContentAdmin = (props) => {
         <p>Manage users and their access levels</p>
 
         <div>
-          <Button>Add User</Button>
+          <Button
+            onClick={() => {
+              setUserAddModalState(true);
+            }}>
+            Add User
+          </Button>
         </div>
         <ListGroup className="mt-3">
           {users.map((user) => {

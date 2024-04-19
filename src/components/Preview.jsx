@@ -1,4 +1,3 @@
-import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { BasicSpinner } from "./Spinners";
@@ -41,23 +40,25 @@ export const PreviewFile = (props) => {
   );
 };
 
-const ViewerComponent = () => {
-  return (
-    <div>
-      <DocViewer
-        pluginRenderers={[...DocViewerRenderers]}
-        documents={[
-          {
-            uri: URL.createObjectURL(new Blob([props.previewBinary])),
-            // uri: `${props.previewBinary}`,
+//use this com in future
 
-            fileType: `${props.previewFileType}`,
-          },
-          // {
-          //   uri: "https://calibre-ebook.com/downloads/demos/demo.docx",
-          // },
-        ]}
-      />
-    </div>
-  );
-};
+// const ViewerComponent = () => {
+//   return (
+//     <div>
+//       <DocViewer
+//         pluginRenderers={[...DocViewerRenderers]}
+//         documents={[
+//           {
+//             uri: URL.createObjectURL(new Blob([props.previewBinary])),
+//             // uri: `${props.previewBinary}`,
+
+//             fileType: `${props.previewFileType}`,
+//           },
+//           // {
+//           //   uri: "https://calibre-ebook.com/downloads/demos/demo.docx",
+//           // },
+//         ]}
+//       />
+//     </div>
+//   );
+// };

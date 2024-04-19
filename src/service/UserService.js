@@ -34,4 +34,21 @@ export class UserService {
       return error;
     }
   }
+
+  async addUser(data) {
+    try {
+      const url = new URL(backendUrl + "/api/v1/user/create-user");
+
+      const response = await fetch(url, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: data,
+      });
+
+      return response;
+    } catch (error) {
+      return error;
+    }
+  }
 }
