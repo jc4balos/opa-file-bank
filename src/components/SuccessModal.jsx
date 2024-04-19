@@ -2,8 +2,7 @@ import { React, useEffect, useState } from "react";
 import { Button, Modal, Spinner } from "react-bootstrap";
 
 const SuccessModal = (props) => {
-  const [SuccessMessages, setSuccessMessages] = useState(props.successMessages);
-  console.log(SuccessMessages);
+  const [successMessages, setSuccessMessages] = useState(props.successMessages);
   useEffect(() => {
     setSuccessMessages(props.successMessages);
   }, [props.successMessages]);
@@ -19,7 +18,21 @@ const SuccessModal = (props) => {
         <Modal.Title>{props.successModalHeading}</Modal.Title>
       </Modal.Header>
       <Modal.Body className="text-center">
-        <span className="d-block">{props.successMessages}</span>
+        {Array.isArray(successMessages) ? (
+          <ul>
+            {successMessages.map((successMessage, index) => (
+              <li key={index}>{successMessage}</li>
+            ))}
+          </ul>
+        ) : typeof successMessages === "object" ? (
+          <ul>
+            {Object.entries(successMessages).map(([key, value], index) => (
+              <li key={index}>{value}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>{successMessages}</p>
+        )}
         <Spinner animation="border" role="status">
           <span className="visually-hidden">Loading...</span>
         </Spinner>

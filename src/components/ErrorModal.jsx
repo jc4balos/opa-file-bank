@@ -21,9 +21,15 @@ const ErrorModal = (props) => {
       <Modal.Body>
         {Array.isArray(errorMessages) ? (
           <ul>
-            {errorMessages.map((errorMessage, index) => {
-              return <li key={index}>{errorMessage}</li>;
-            })}
+            {errorMessages.map((errorMessage, index) => (
+              <li key={index}>{errorMessage}</li>
+            ))}
+          </ul>
+        ) : typeof errorMessages === "object" ? (
+          <ul>
+            {Object.entries(errorMessages).map(([key, value], index) => (
+              <li key={index}>{value}</li>
+            ))}
           </ul>
         ) : (
           <p>{errorMessages}</p>
