@@ -18,7 +18,17 @@ const ErrorModal = (props) => {
       <Modal.Header className="bg-danger text-light" closeButton>
         <Modal.Title>{props.errorModalHeading}</Modal.Title>
       </Modal.Header>
-      <Modal.Body>{errorMessages}</Modal.Body>
+      <Modal.Body>
+        {Array.isArray(errorMessages) ? (
+          <ul>
+            {errorMessages.map((errorMessage, index) => {
+              return <li key={index}>{errorMessage}</li>;
+            })}
+          </ul>
+        ) : (
+          <p>{errorMessages}</p>
+        )}
+      </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={props.closeErrorModal}>
           Close
