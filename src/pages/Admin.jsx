@@ -1,6 +1,6 @@
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Button,
   Col,
@@ -13,6 +13,7 @@ import {
   Tabs,
 } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
+import { Context } from "../App";
 import { Navigation } from "../components/Navigation";
 import { UserAdd } from "../components/UserAdd";
 import { UserEdit } from "../components/UserEdit";
@@ -61,7 +62,10 @@ export const Admin = (props) => {
             />
           </Col>
           <Col lg="10">
-            <AdminNavigation showErrorModal={props.showErrorModal} />
+            <AdminNavigation
+              showErrorModal={props.showErrorModal}
+              showSuccessModal={props.showSuccessModal}
+            />
           </Col>
         </Row>
       </Container>
@@ -93,7 +97,10 @@ const AdminNavigation = (props) => {
   return (
     <Tabs defaultActiveKey="users" id="admin-navigation" className="mb-3 mt-3">
       <Tab eventKey="users" title="Users">
-        <UsersContentAdmin showErrorModal={props.showErrorModal} />
+        <UsersContentAdmin
+          showErrorModal={props.showErrorModal}
+          showSuccessModal={props.showSuccessModal}
+        />
       </Tab>
       <Tab eventKey="accessLevels" title="Access Levels">
         Tab content for Profile
@@ -144,6 +151,51 @@ const UsersContentAdmin = (props) => {
     setUserAddModalState(false);
   };
 
+  const handleEditUser = (user) => {
+    setUserFirstName(user.firstName);
+    setUserMiddleName(user.middleName);
+    setUserLastName(user.lastName);
+    setUserName(user.userName);
+    setUserTitle(user.title);
+    setUserAccessLevelId(user.accessLevelId);
+    setUserId(user.userId);
+    setUserPassword(user.password);
+    setUserEditModalState(true);
+  };
+
+  const handleDeleteUser = (onDelete) => {
+    setInfoModalHeading("Delete User");
+    setInfoModalMessage("Are you sure you want to delete this user?");
+    setInfoModalAction(() => onDelete);
+    setInfoModalActionText("Delete");
+    setInfoModalState(true);
+  };
+
+  const deleteUser = async (userId) => {
+    const userService = new UserService();
+    const response = await userService.deactivateUser(userId);
+    if (response.status === 200) {
+      props.showSuccessModal("File Deleted Successfully");
+      fetchUsers();
+    } else {
+      props.showErrorModal("Failed to delete file");
+    }
+  };
+
+  const { infoModal } = useContext(Context);
+  const [
+    infoModalState,
+    setInfoModalState,
+    infoModalHeading,
+    setInfoModalHeading,
+    infoModalMessage,
+    setInfoModalMessage,
+    infoModalAction,
+    setInfoModalAction,
+    infoModalActionText,
+    setInfoModalActionText,
+  ] = infoModal;
+
   return (
     <div>
       {userAddModalState && (
@@ -176,6 +228,10 @@ const UsersContentAdmin = (props) => {
 
       {userEditModalState && (
         <UserEdit
+          userName={userName}
+          setUserName={setUserName}
+          userTitle={userTitle}
+          setUserTitle={setUserTitle}
           showErrorModal={props.showErrorModal}
           showSuccessModal={props.showSuccessModal}
           closeUserEditModal={closeUserEditModal}
@@ -186,14 +242,15 @@ const UsersContentAdmin = (props) => {
           setUserMiddleName={setUserMiddleName}
           userLastName={userLastName}
           setUserLastName={setUserLastName}
-          userTitle={userTitle}
-          setUserTitle={setUserTitle}
           userAccessLevelId={userAccessLevelId}
           setUserAccesslevelId={setUserAccessLevelId}
           userId={userId}
           setUserId={setUserId}
           userPassword={userPassword}
           setUserPassword={setUserPassword}
+          fetchUsers={() => {
+            fetchUsers();
+          }}
         />
       )}
       <Stack>
@@ -227,17 +284,18 @@ const UsersContentAdmin = (props) => {
                       className="zoom-on-hover"
                       icon={faEdit}
                       onClick={() => {
-                        setUserFirstName(user.firstName);
-                        setUserMiddleName(user.middleName);
-                        setUserLastName(user.lastName);
-                        setUserTitle(user.title);
-                        setUserAccessLevelId(user.accessLevelId);
-                        setUserId(user.userId);
-                        setUserPassword(user.password);
-                        setUserEditModalState(true);
+                        handleEditUser(user);
                       }}
                     />{" "}
-                    <FontAwesomeIcon className="zoom-on-hover" icon={faTrash} />{" "}
+                    <FontAwesomeIcon
+                      className="zoom-on-hover"
+                      icon={faTrash}
+                      onClick={() => {
+                        handleDeleteUser(() => {
+                          deleteUser(user.userId);
+                        });
+                      }}
+                    />{" "}
                   </div>
                 </div>
               </ListGroup.Item>

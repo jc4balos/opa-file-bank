@@ -51,4 +51,25 @@ export class UserService {
       return error;
     }
   }
+
+  async deactivateUser(userId) {
+    try {
+      const url = new URL(backendUrl + "/api/v1/user/deactivate-user");
+      const params = new URLSearchParams({
+        userId: userId,
+      });
+
+      url.search = params;
+
+      const response = await fetch(url, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      return response;
+    } catch (error) {
+      return error;
+    }
+  }
 }

@@ -19,7 +19,6 @@ export const UserAdd = (props) => {
       setAccessLevels(data);
       if (props.userAccessLevelId === null) {
         props.setUserAccessLevelId(1);
-        console.log("accessLevlid:" + props.userAccessLevelId);
       }
     } else {
       props.showErrorModal(data);
@@ -29,22 +28,20 @@ export const UserAdd = (props) => {
   const addUser = async () => {
     const userService = new UserService();
     const data = {
-      firstName: props.userFirstName,
-      middleName: props.userMiddleName,
-      lastName: props.userLastName,
-      userName: props.userName,
-      password: props.userPassword,
-      title: props.userTitle,
+      firstName: `${props.userFirstName}`,
+      middleName: `${props.userMiddleName}`,
+      lastName: `${props.userLastName}`,
+      userName: `${props.userName}`,
+      password: `${props.userPassword}`,
+      title: `${props.userTitle}`,
       accessLevelId: props.userAccessLevelId,
-      active: true,
     };
-    console.log(data);
     const response = await userService.addUser(JSON.stringify(data));
     if (response.ok) {
       const data = await response.json();
-      props.showSuccessModal(data);
+      props.showSuccessModal("User Added Successfully");
       props.closeUserAddModal();
-      props.fetchUsers();
+      window.location.reload();
     } else {
       const data = await response.json();
       props.showErrorModal(data);
