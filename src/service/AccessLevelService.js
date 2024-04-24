@@ -38,4 +38,24 @@ export class AccessLevelService {
       return error;
     }
   }
+
+  async deleteAccessLevel(accessLevelId) {
+    try {
+      const url = new URL(
+        backendUrl + "/api/v1/access-level/delete-access-level"
+      );
+      url.search = new URLSearchParams({ accessLevelId: accessLevelId });
+
+      const response = await fetch(url, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return response;
+    } catch (error) {
+      return error;
+    }
+  }
 }

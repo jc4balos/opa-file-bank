@@ -297,13 +297,55 @@ const AccessLevelsContentAdmin = (props) => {
   const [addAccessLevelModalState, setAddAccessLevelModalState] =
     useState(false);
 
+  const [reloaded, setReloaded] = useState(true);
   const [accessLevels, setAccessLevels] = useState([]);
 
-  const { errorModal } = useContext(Context);
+  const { errorModal, infoModal, successModal } = useContext(Context);
+
   const [errorData, setErrorData, errorModalState, setErrorModalState] =
     errorModal;
+  const [
+    infoModalState,
+    setInfoModalState,
+    infoModalHeading,
+    setInfoModalHeading,
+    infoModalMessage,
+    setInfoModalMessage,
+    infoModalAction,
+    setInfoModalAction,
+    infoModalActionText,
+    setInfoModalActionText,
+  ] = infoModal;
+  const [successData, setSuccessData, successModalState, setSuccessModalState] =
+    successModal;
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    fetchAccessLevels();
+    setReloaded(true);
+  }, [reloaded]);
+
+  const handleDeleteAccessLevel = (onDelete) => {
+    setInfoModalHeading("Delete Access Level");
+    setInfoModalMessage("Are you sure you want to delete this access level?");
+    setInfoModalAction(() => onDelete);
+    setInfoModalActionText("Delete");
+    setInfoModalState(true);
+  };
+
+  const deleteAccessLevel = async (accessLevelId) => {
+    const accessLevelService = new AccessLevelService();
+    const response = await accessLevelService.deleteAccessLevel(accessLevelId);
+    if (response.ok) {
+      const data = await response.json();
+      setSuccessData(data);
+      setSuccessModalState(true);
+      setReloaded(false);
+      setInfoModalState(false);
+    } else {
+      const data = await response.json();
+      setErrorData(data);
+    }
+  };
 
   const fetchAccessLevels = async () => {
     const accessLevelService = new AccessLevelService();
@@ -313,6 +355,7 @@ const AccessLevelsContentAdmin = (props) => {
       setAccessLevels(data);
     } else {
       const data = await response.json();
+      setErrorData(data);
     }
   };
 
@@ -341,27 +384,20 @@ const AccessLevelsContentAdmin = (props) => {
           </Button>
         </div>
         <ListGroup className="mt-3">
-          {users.map((user) => {
+          {accessLevels.map((accessLevel) => {
             return (
               <ListGroup.Item
                 className="d-flex justify-content-between"
-                key={user.userId}>
-                <span></span>
+                key={accessLevel.accessLevelId}>
+                <span>{accessLevel.accessLevelName}</span>
                 <div className=" d-flex justify-content-end">
                   <div className="align-items-center d-flex gap-3">
                     <FontAwesomeIcon
                       className="zoom-on-hover"
-                      icon={faEdit}
-                      onClick={() => {
-                        handleEditUser(user);
-                      }}
-                    />{" "}
-                    <FontAwesomeIcon
-                      className="zoom-on-hover"
                       icon={faTrash}
                       onClick={() => {
-                        handleDeleteUser(() => {
-                          deleteUser(user.userId);
+                        handleDeleteAccessLevel(() => {
+                          deleteAccessLevel(accessLevel.accessLevelId);
                         });
                       }}
                     />{" "}
