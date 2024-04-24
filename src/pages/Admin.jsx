@@ -2,11 +2,10 @@ import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useContext, useEffect, useState } from "react";
 import {
+  Badge,
   Button,
   Col,
-  Container,
   ListGroup,
-  ProgressBar,
   Row,
   Stack,
   Tab,
@@ -14,10 +13,13 @@ import {
 } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import { Context } from "../App";
+import { AccessLevelAdd } from "../components/AccessLevelAdd";
 import { Navigation } from "../components/Navigation";
+import { SideNav } from "../components/SideNav";
 import { UserAdd } from "../components/UserAdd";
 import { UserEdit } from "../components/UserEdit";
 import "../css/global.css";
+import { AccessLevelService } from "../service/AccessLevelService";
 import { SessionService } from "../service/SessionService";
 import { UserService } from "../service/UserService";
 export const Admin = (props) => {
@@ -50,15 +52,17 @@ export const Admin = (props) => {
   return (
     <div>
       <Navigation />
-      <Container>
+      <div className="m-lg-3 m-1">
         <Row>
           <Col className="d-none d-lg-flex" lg="2">
-            <SideNavAdmin
+            <SideNav
               userId={props.userId}
               accessLevelId={props.accessLevelId}
               userFullName={props.userFullName}
               userName={props.userName}
               userTitle={props.userTitle}
+              showErrorModal={props.showErrorModal}
+              showSuccessModal={props.showSuccessModal}
             />
           </Col>
           <Col lg="10">
@@ -68,28 +72,8 @@ export const Admin = (props) => {
             />
           </Col>
         </Row>
-      </Container>
+      </div>
     </div>
-  );
-};
-const SideNavAdmin = (props) => {
-  return (
-    <Stack className="">
-      <span className="fw-bold text-center">{props.userFullName}</span>
-      <small className="text-center">{props.userTitle}</small>
-      <small className="text-muted text-center">@{props.userName}</small>
-
-      <ListGroup as="ul" className="mt-3">
-        <ListGroup.Item as="li" className="text-center">
-          <span className="fw-bold">Storage</span>
-          <ProgressBar now={60} label={`60%`} />
-          <small>60MB of 1024MB</small>
-        </ListGroup.Item>
-        <ListGroup.Item as="li">
-          <FontAwesomeIcon icon={faTrash} /> Trash
-        </ListGroup.Item>
-      </ListGroup>
-    </Stack>
   );
 };
 
@@ -103,7 +87,7 @@ const AdminNavigation = (props) => {
         />
       </Tab>
       <Tab eventKey="accessLevels" title="Access Levels">
-        Tab content for Profile
+        <AccessLevelsContentAdmin />
       </Tab>
       <Tab eventKey="trashFiles" title="Trash Files">
         Tab content for Contact
@@ -276,8 +260,93 @@ const UsersContentAdmin = (props) => {
                     {user.firstName} {user.middleName} {user.lastName}
                   </span>
                   <small className="text-muted">{user.title}</small>
-                  <span>Insert Access Level Name here</span>
+                  <Badge className="small" bg="secondary">
+                    {user.accessLevelName}
+                  </Badge>
                 </div>
+                <div className=" d-flex justify-content-end">
+                  <div className="align-items-center d-flex gap-3">
+                    <FontAwesomeIcon
+                      className="zoom-on-hover"
+                      icon={faEdit}
+                      onClick={() => {
+                        handleEditUser(user);
+                      }}
+                    />{" "}
+                    <FontAwesomeIcon
+                      className="zoom-on-hover"
+                      icon={faTrash}
+                      onClick={() => {
+                        handleDeleteUser(() => {
+                          deleteUser(user.userId);
+                        });
+                      }}
+                    />{" "}
+                  </div>
+                </div>
+              </ListGroup.Item>
+            );
+          })}
+        </ListGroup>
+      </Stack>
+    </div>
+  );
+};
+
+const AccessLevelsContentAdmin = (props) => {
+  const [addAccessLevelModalState, setAddAccessLevelModalState] =
+    useState(false);
+
+  const [accessLevels, setAccessLevels] = useState([]);
+
+  const { errorModal } = useContext(Context);
+  const [errorData, setErrorData, errorModalState, setErrorModalState] =
+    errorModal;
+
+  useEffect(() => {}, []);
+
+  const fetchAccessLevels = async () => {
+    const accessLevelService = new AccessLevelService();
+    const response = await accessLevelService.getAllAccessLevels();
+    if (response.ok) {
+      const data = await response.json();
+      setAccessLevels(data);
+    } else {
+      const data = await response.json();
+    }
+  };
+
+  const closeAddAccessLevelModal = () => {
+    setAddAccessLevelModalState(false);
+  };
+
+  return (
+    <div>
+      {addAccessLevelModalState && (
+        <AccessLevelAdd
+          showAddAccessLevelModal={addAccessLevelModalState}
+          closeAddAccessLevelModal={closeAddAccessLevelModal}
+        />
+      )}
+      <Stack>
+        <h4 className="fw-bold">Access Levels</h4>
+        <p>Manage user access levels.</p>
+
+        <div>
+          <Button
+            onClick={() => {
+              setAddAccessLevelModalState(true);
+            }}>
+            Add Access Level
+          </Button>
+        </div>
+        <ListGroup className="mt-3">
+          {users.map((user) => {
+            return (
+              <ListGroup.Item
+                className="d-flex justify-content-between"
+                key={user.userId}>
+                <span></span>
                 <div className=" d-flex justify-content-end">
                   <div className="align-items-center d-flex gap-3">
                     <FontAwesomeIcon

@@ -28,7 +28,7 @@ const ErrorModal = (props) => {
         ) : typeof errorMessages === "object" ? (
           <ul>
             {Object.entries(errorMessages).map(([key, value], index) => (
-              <li key={index}>{value}</li>
+              <li key={index}>{value} </li>
             ))}
           </ul>
         ) : (

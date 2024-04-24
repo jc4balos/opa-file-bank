@@ -18,4 +18,24 @@ export class AccessLevelService {
       return error;
     }
   }
+
+  async addAccessLevel(data) {
+    try {
+      const url = new URL(
+        backendUrl + "/api/v1/access-level/create-access-level"
+      );
+
+      const response = await fetch(url, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: data,
+      });
+      return response;
+    } catch (error) {
+      return error;
+    }
+  }
 }
