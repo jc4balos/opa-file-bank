@@ -23,6 +23,8 @@ import { AccessLevelService } from "../service/AccessLevelService";
 import { SessionService } from "../service/SessionService";
 import { UserService } from "../service/UserService";
 export const Admin = (props) => {
+  const { errorModal, userData } = useContext(Context);
+
   const location = useLocation();
 
   useEffect(() => {
@@ -32,17 +34,19 @@ export const Admin = (props) => {
 
       if (response.status !== 200 && location.pathname !== "/login") {
         const data = await response.json();
-        props.showErrorModal(data.message);
+        errorModal.showErrorModal(data.message);
         setTimeout(() => {
           window.location.href = "/login";
         }, 3000);
       } else {
         const data = await response.json();
-        props.setUserFullName(data.userFullName);
-        props.setUserName(data.userName);
-        props.setUserTitle(data.userTitle);
-        props.setAccessLevelId(data.accessLevelId);
-        props.setUserId(data.userId);
+        userData.setUserData(
+          data.userFullName,
+          data.userName,
+          data.userFullName,
+          data.userId,
+          data.accessLevelId
+        );
       }
     };
 
@@ -55,21 +59,10 @@ export const Admin = (props) => {
       <div className="m-lg-3 m-1">
         <Row>
           <Col className="d-none d-lg-flex" lg="2">
-            <SideNav
-              userId={props.userId}
-              accessLevelId={props.accessLevelId}
-              userFullName={props.userFullName}
-              userName={props.userName}
-              userTitle={props.userTitle}
-              showErrorModal={props.showErrorModal}
-              showSuccessModal={props.showSuccessModal}
-            />
+            <SideNav />
           </Col>
           <Col lg="10">
-            <AdminNavigation
-              showErrorModal={props.showErrorModal}
-              showSuccessModal={props.showSuccessModal}
-            />
+            <AdminNavigation />
           </Col>
         </Row>
       </div>
@@ -81,10 +74,7 @@ const AdminNavigation = (props) => {
   return (
     <Tabs defaultActiveKey="users" id="admin-navigation" className="mb-3 mt-3">
       <Tab eventKey="users" title="Users">
-        <UsersContentAdmin
-          showErrorModal={props.showErrorModal}
-          showSuccessModal={props.showSuccessModal}
-        />
+        <UsersContentAdmin />
       </Tab>
       <Tab eventKey="accessLevels" title="Access Levels">
         <AccessLevelsContentAdmin />
@@ -97,6 +87,8 @@ const AdminNavigation = (props) => {
 };
 
 const UsersContentAdmin = (props) => {
+  const { errorModal, successModal, infoModal } = useContext(Context);
+
   const [userEditModalState, setUserEditModalState] = useState(false);
   const [userAddModalState, setUserAddModalState] = useState(false);
 
@@ -113,7 +105,7 @@ const UsersContentAdmin = (props) => {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  });
 
   const fetchUsers = async () => {
     const userService = new UserService();
@@ -123,7 +115,7 @@ const UsersContentAdmin = (props) => {
       setUsers(data);
     } else {
       const data = await response.json();
-      props.showErrorModal(data.message);
+      errorModal.showErrorModal(data.message);
     }
   };
 
@@ -148,37 +140,26 @@ const UsersContentAdmin = (props) => {
   };
 
   const handleDeleteUser = (onDelete) => {
-    setInfoModalHeading("Delete User");
-    setInfoModalMessage("Are you sure you want to delete this user?");
-    setInfoModalAction(() => onDelete);
-    setInfoModalActionText("Delete");
-    setInfoModalState(true);
+    infoModal.showInfoModal(
+      "Delete User",
+      "Are you sure you want to delete this user?",
+      onDelete,
+      "Delete"
+    );
   };
 
   const deleteUser = async (userId) => {
     const userService = new UserService();
     const response = await userService.deactivateUser(userId);
     if (response.status === 200) {
-      props.showSuccessModal("File Deleted Successfully");
+      successModal.showSuccessModal("User Deleted Successfully");
       fetchUsers();
+      infoModal.closeInfoModal();
     } else {
-      props.showErrorModal("Failed to delete file");
+      const data = response.json();
+      errorModal.showErrorModal(data);
     }
   };
-
-  const { infoModal } = useContext(Context);
-  const [
-    infoModalState,
-    setInfoModalState,
-    infoModalHeading,
-    setInfoModalHeading,
-    infoModalMessage,
-    setInfoModalMessage,
-    infoModalAction,
-    setInfoModalAction,
-    infoModalActionText,
-    setInfoModalActionText,
-  ] = infoModal;
 
   return (
     <div>
@@ -186,8 +167,6 @@ const UsersContentAdmin = (props) => {
         <UserAdd
           userName={userName}
           setUserName={setUserName}
-          showErrorModal={props.showErrorModal}
-          showSuccessModal={props.showSuccessModal}
           closeUserAddModal={closeUserAddModal}
           showUserAddModal={userAddModalState}
           userFirstName={userFirstName}
@@ -216,8 +195,6 @@ const UsersContentAdmin = (props) => {
           setUserName={setUserName}
           userTitle={userTitle}
           setUserTitle={setUserTitle}
-          showErrorModal={props.showErrorModal}
-          showSuccessModal={props.showSuccessModal}
           closeUserEditModal={closeUserEditModal}
           showUserEditModal={userEditModalState}
           userFirstName={userFirstName}
@@ -302,34 +279,18 @@ const AccessLevelsContentAdmin = (props) => {
 
   const { errorModal, infoModal, successModal } = useContext(Context);
 
-  const [errorData, setErrorData, errorModalState, setErrorModalState] =
-    errorModal;
-  const [
-    infoModalState,
-    setInfoModalState,
-    infoModalHeading,
-    setInfoModalHeading,
-    infoModalMessage,
-    setInfoModalMessage,
-    infoModalAction,
-    setInfoModalAction,
-    infoModalActionText,
-    setInfoModalActionText,
-  ] = infoModal;
-  const [successData, setSuccessData, successModalState, setSuccessModalState] =
-    successModal;
-
   useEffect(() => {
     fetchAccessLevels();
     setReloaded(true);
   }, [reloaded]);
 
   const handleDeleteAccessLevel = (onDelete) => {
-    setInfoModalHeading("Delete Access Level");
-    setInfoModalMessage("Are you sure you want to delete this access level?");
-    setInfoModalAction(() => onDelete);
-    setInfoModalActionText("Delete");
-    setInfoModalState(true);
+    infoModal.showInfoModal(
+      "Delete Access Level",
+      "Are you sure you want to delete this access level?",
+      onDelete,
+      "Delete"
+    );
   };
 
   const deleteAccessLevel = async (accessLevelId) => {
@@ -337,13 +298,12 @@ const AccessLevelsContentAdmin = (props) => {
     const response = await accessLevelService.deleteAccessLevel(accessLevelId);
     if (response.ok) {
       const data = await response.json();
-      setSuccessData(data);
-      setSuccessModalState(true);
+      successModal.showSuccessModal(data);
       setReloaded(false);
-      setInfoModalState(false);
+      infoModal.closeInfoModal();
     } else {
       const data = await response.json();
-      setErrorData(data);
+      errorModal.showErrorModal(data);
     }
   };
 
@@ -355,7 +315,7 @@ const AccessLevelsContentAdmin = (props) => {
       setAccessLevels(data);
     } else {
       const data = await response.json();
-      setErrorData(data);
+      errorModal.showErrorModal(data);
     }
   };
 

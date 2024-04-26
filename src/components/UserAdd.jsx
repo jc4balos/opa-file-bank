@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
+import { Context } from "../App";
 import { AccessLevelService } from "../service/AccessLevelService";
 import { UserService } from "../service/UserService";
 
 export const UserAdd = (props) => {
+  const { successModal, errorModal } = useContext(Context);
   const [accessLevels, setAccessLevels] = useState([]);
 
   useEffect(() => {
@@ -21,7 +23,7 @@ export const UserAdd = (props) => {
         props.setUserAccessLevelId(1);
       }
     } else {
-      props.showErrorModal(data);
+      errorModal.showErrorModal(data);
     }
   };
 
@@ -39,12 +41,12 @@ export const UserAdd = (props) => {
     const response = await userService.addUser(JSON.stringify(data));
     if (response.ok) {
       const data = await response.json();
-      props.showSuccessModal("User Added Successfully");
+      successModal.showSuccessModal("User Added Successfully");
       props.closeUserAddModal();
       window.location.reload();
     } else {
       const data = await response.json();
-      props.showErrorModal(data);
+      errorModal.showErrorModal(data);
     }
   };
 

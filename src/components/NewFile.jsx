@@ -1,11 +1,13 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
+import { Context } from "../App";
 import { FileService } from "../service/FileService";
 
 export const NewFile = (props) => {
   const [fileName, setFileName] = useState("");
   const [fileDescription, setFileDescription] = useState("");
   const fileInput = useRef();
+  const { errorModal, successModal } = useContext(Context);
 
   const parentFolderId = props.currentFolderId;
 
@@ -13,7 +15,7 @@ export const NewFile = (props) => {
     const fileService = new FileService();
     const formData = new FormData();
     if (!fileInput.current.files[0]) {
-      props.showErrorModal("Please select a file to upload");
+      errorModal.showErrorModal("Please select a file to upload");
       return;
     }
     formData.append("multipartFile", fileInput.current.files[0]);
@@ -35,16 +37,16 @@ export const NewFile = (props) => {
       const response = await fileService.uploadFile(formData);
 
       if (response.ok) {
-        props.showSuccessModal("File Added Successfully");
+        successModal.showSuccessModal("File Added Successfully");
         props.closeNewFileModal();
       } else {
         const data = await response.json();
         const stringArray = data.map((item) => JSON.stringify(item));
 
-        props.showErrorModal(stringArray.join("\n"));
+        errorModal.showErrorModal(stringArray.join("\n"));
       }
     } catch (error) {
-      props.showErrorModal(JSON.stringify(error.message));
+      errorModal.showErrorModal(JSON.stringify(error.message));
     } finally {
       props.fetchFilesAndFolders();
     }

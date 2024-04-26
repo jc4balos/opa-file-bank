@@ -1,4 +1,5 @@
 import {
+  faArrowUpFromBracket,
   faDownload,
   faEye,
   faFile,
@@ -32,57 +33,63 @@ import { FileService } from "../service/FileService";
 import { FolderService } from "../service/FolderService";
 import { SessionService } from "../service/SessionService";
 
-export const Dashboard = (props) => {
-  const [isLoading, setIsLoading] = useState(true); // Add this line
+export const Dashboard = () => {
+  const { errorModal, userData } = useContext(Context);
+
+  const [isLoading, setIsLoading] = useState(true);
   const [currentFolderId, setCurrentFolderId] = useState(1);
+
   const [folderDirectory, setFolderDirectory] = useState([]);
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
   const location = useLocation();
 
   useEffect(() => {
-    const fetchSessionData = async () => {
-      const sessionService = new SessionService();
-      const response = await sessionService.getSessionData();
-
-      if (response.status !== 200 && location.pathname !== "/login") {
-        const data = await response.json();
-        props.showErrorModal(data.message);
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 3000);
-      } else {
-        const data = await response.json();
-        props.setUserFullName(data.userFullName);
-        props.setUserName(data.userName);
-        props.setUserTitle(data.userTitle);
-        props.setAccessLevelId(data.accessLevelId);
-        props.setUserId(data.userId);
-        console.log(data);
-      }
-    };
-
     fetchSessionData();
-  }, []);
+  });
 
   useEffect(() => {
-    if (props.userId) {
+    if (userData.userId) {
       fetchFilesAndFolders();
     }
-  }, [currentFolderId, props.userId]);
+  }, [currentFolderId, userData.userId, folderDirectory]);
+
+  const fetchSessionData = async () => {
+    const sessionService = new SessionService();
+    const response = await sessionService.getSessionData();
+
+    if (response.status !== 200 && location.pathname !== "/login") {
+      const data = await response.json();
+      errorModal.showErrorModal(data.message);
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 3000);
+    } else {
+      const data = await response.json();
+      userData.setUserData(
+        data.userFullName,
+        data.userName,
+        data.userFullName,
+        data.userId,
+        data.accessLevelId
+      );
+
+      console.log(data);
+    }
+  };
 
   const fetchFilesAndFolders = async () => {
     try {
       setIsLoading(true);
       const folderService = new FolderService();
       const response = await folderService.getAllFilesInFolder(
-        currentFolderId,
-        props.userId
+        currentFolderId
+        // userData.userId
       );
       setFiles(response.files);
       setFolders(response.folders);
     } catch (error) {
-      props.showErrorModal(JSON.stringify(error.message));
+      errorModal.showErrorModal(JSON.stringify(error.message));
     } finally {
       setIsLoading(false);
     }
@@ -107,6 +114,7 @@ export const Dashboard = (props) => {
     setFolderDirectory([]);
   };
 
+  //modify this
   const removeDirectoryAfterIndex = (index) => {
     setFolderDirectory((prevFolderDirectory) =>
       prevFolderDirectory.slice(0, index + 1)
@@ -119,27 +127,15 @@ export const Dashboard = (props) => {
       <div className="m-lg-3 m-1">
         <Row>
           <Col className="d-none d-lg-flex" lg="2">
-            <SideNav
-              userId={props.userId}
-              accessLevelId={props.accessLevelId}
-              userFullName={props.userFullName}
-              userName={props.userName}
-              userTitle={props.userTitle}
-              showErrorModal={props.showErrorModal}
-              showSuccessModal={props.showSuccessModal}
-            />
+            <SideNav />
           </Col>
           <Col lg="10">
             <MainNavigation
               currentFolderId={currentFolderId}
               setCurrentFolderId={setCurrentFolderId}
-              userId={props.userId}
               folderDirectory={folderDirectory}
               resetDirectory={resetDirectory}
               removeDirectoryAfterIndex={removeDirectoryAfterIndex}
-              showInfoModal={props.showInfoModal}
-              showErrorModal={props.showErrorModal}
-              showSuccessModal={props.showSuccessModal}
               folders={folders}
               files={files}
               setFolders={setFolders}
@@ -148,10 +144,7 @@ export const Dashboard = (props) => {
               fetchFilesAndFolders={fetchFilesAndFolders}
             />
             <Content
-              userId={props.userId}
               currentFolderId={currentFolderId}
-              showErrorModal={props.showErrorModal}
-              showSuccessModal={props.showSuccessModal}
               fetchFilesAndFolders={fetchFilesAndFolders}
               setCurrentFolderId={setCurrentFolderId}
               addFolderOnDirectory={addFolderOnDirectory}
@@ -179,8 +172,6 @@ const MainNavigation = (props) => {
       {newFolderModalState && (
         <NewFolder
           showNewFolderModal={setNewFolderModalState}
-          showErrorModal={props.showErrorModal}
-          showSuccessModal={props.showSuccessModal}
           currentFolderId={props.currentFolderId}
           fetchFilesAndFolders={props.fetchFilesAndFolders}
           closeNewFolderModal={() => {
@@ -191,35 +182,48 @@ const MainNavigation = (props) => {
       {newFileModalState && (
         <NewFile
           showNewFileModal={setNewFileModalState}
-          showErrorModal={props.showErrorModal}
-          showSuccessModal={props.showSuccessModal}
           currentFolderId={props.currentFolderId}
           fetchFilesAndFolders={props.fetchFilesAndFolders}
           closeNewFileModal={() => {
             setNewFileModalState(false);
           }}></NewFile>
       )}
-      <Breadcrumb>
-        <Breadcrumb.Item
-          onClick={() => {
-            props.setCurrentFolderId(1);
-            props.resetDirectory();
-          }}>
-          root
-        </Breadcrumb.Item>
-        {props.folderDirectory.map((folder, index) => {
-          return (
+
+      <div className="d-flex align-items gap-1">
+        <div className="zoom-on-hover">
+          <FontAwesomeIcon
+            onClick={() => {
+              //backbutton function
+            }}
+            style={{ fontSize: "40px" }}
+            icon={faArrowUpFromBracket}
+          />
+        </div>
+        <div className="d-flex align-self-center">
+          <Breadcrumb>
             <Breadcrumb.Item
-              key={index}
               onClick={() => {
-                props.setCurrentFolderId(folder.folderId);
-                props.removeDirectoryAfterIndex(index);
+                props.setCurrentFolderId(1);
+                props.resetDirectory();
               }}>
-              {folder.folderName}
+              root
             </Breadcrumb.Item>
-          );
-        })}
-      </Breadcrumb>
+            {props.folderDirectory.map((folder, index) => {
+              return (
+                <Breadcrumb.Item
+                  key={index}
+                  onClick={() => {
+                    props.setCurrentFolderId(folder.folderId);
+                    props.removeDirectoryAfterIndex(index);
+                  }}>
+                  {folder.folderName}
+                </Breadcrumb.Item>
+              );
+            })}
+          </Breadcrumb>
+        </div>
+      </div>
+
       <Form>
         <Button
           onClick={() => {
@@ -244,41 +248,16 @@ const MainNavigation = (props) => {
 };
 
 const Content = (props) => {
-  const { infoModal } = useContext(Context);
-  const [
-    infoModalState,
-    setInfoModalState,
-    infoModalHeading,
-    setInfoModalHeading,
-    infoModalMessage,
-    setInfoModalMessage,
-    infoModalAction,
-    setInfoModalAction,
-    infoModalActionText,
-    setInfoModalActionText,
-  ] = infoModal;
-
-  const { previewModal } = useContext(Context);
-  const [
-    previewModalState,
-    setPreviewModalState,
-    previewBinary,
-    setPreviewBinary,
-    previewModalAction,
-    setPreviewModalAction,
-    previewFileType,
-    setPreviewFileType,
-    previewFileName,
-    setPreviewFileName,
-  ] = previewModal;
+  const { infoModal, previewModal, errorModal, successModal } =
+    useContext(Context);
 
   const confirmDeleteFile = (onDelete) => {
-    setInfoModalHeading("Delete File");
-    setInfoModalMessage("Are you sure you want to delete this file?");
-    setInfoModalAction(() => onDelete);
-    setInfoModalActionText("Delete");
-    setInfoModalState(true);
-    console.log(infoModalState);
+    infoModal.showInfoModal(
+      "Delete File",
+      "Are you sure you want to delete this file?",
+      onDelete,
+      "Delete"
+    );
   };
 
   const previewFile = async (fileId, action, fileName, fileType) => {
@@ -289,16 +268,12 @@ const Content = (props) => {
       // a.href = url;
       const data = await response.arrayBuffer(response);
       console.log("status 200");
-      setPreviewModalState(true);
-      setPreviewFileType(fileType);
-      setPreviewFileName(fileName);
-      setPreviewBinary(data);
-      setPreviewModalAction(() => action);
-      const blob = URL.createObjectURL(new Blob([data]));
+      previewModal.showPreviewModal(data, action, fileType, fileName);
+      URL.createObjectURL(new Blob([data]));
       console.log(data);
     } else {
       console.log(response.status);
-      props.showErrorModal("Failed to download file");
+      errorModal.showErrorModal("Failed to download file");
     }
   };
 
@@ -314,7 +289,7 @@ const Content = (props) => {
           a.click();
         });
       } else {
-        props.showErrorModal("Failed to download file");
+        errorModal.showErrorModal("Failed to download file");
       }
     });
   };
@@ -323,17 +298,18 @@ const Content = (props) => {
     const fileService = new FileService();
     fileService.deleteFile(fileId).then((response) => {
       if (response.status === 200) {
-        props.showSuccessModal("File Deleted Successfully");
+        successModal.showSuccessModal("File Deleted Successfully");
+        infoModal.closeInfoModal();
         props.fetchFilesAndFolders();
       } else {
-        props.showErrorModal("Failed to delete file");
+        errorModal.showErrorModal("Failed to delete file");
       }
     });
   };
 
   return (
     <div>
-      {infoModalState && <InfoModal />}
+      {infoModal.infoModalState && <InfoModal />}
       {props.folders.length === 0 && props.files.length === 0 && (
         <div className="d-flex justify-content-center align-items-center">
           This folder is empty.

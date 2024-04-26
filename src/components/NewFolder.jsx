@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
+import { Context } from "../App";
 import { FolderService } from "../service/FolderService";
 
 export const NewFolder = (props) => {
   const [folderName, setFolderName] = useState("");
   const [folderDescription, setFolderDescription] = useState("");
+  const { errorModal, successModal } = useContext(Context);
 
   const parentFolderId = props.currentFolderId;
 
@@ -18,16 +20,16 @@ export const NewFolder = (props) => {
     try {
       const response = await folderService.addFolder(data);
       if (response.ok) {
-        props.showSuccessModal("Folder Added Successfully");
+        successModal.showSuccessModal("Folder Added Successfully");
         props.showNewFolderModal(false);
       } else {
         const data = await response.json();
         const stringArray = data.map((item) => JSON.stringify(item));
 
-        props.showErrorModal(stringArray.join("\n"));
+        errorModal.showErrorModal(stringArray.join("\n"));
       }
     } catch (error) {
-      props.showErrorModal(JSON.stringify(error.message));
+      errorModal.showErrorModal(JSON.stringify(error.message));
     } finally {
       props.fetchFilesAndFolders();
     }

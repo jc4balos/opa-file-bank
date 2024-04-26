@@ -4,25 +4,7 @@ import { Context } from "../App";
 import { AccessLevelService } from "../service/AccessLevelService";
 
 export const AccessLevelAdd = (props) => {
-  const { infoModal, errorModal, successModal } = useContext(Context);
-  const [
-    infoModalState,
-    setInfoModalState,
-    infoModalHeading,
-    setInfoModalHeading,
-    infoModalMessage,
-    setInfoModalMessage,
-    infoModalAction,
-    setInfoModalAction,
-    infoModalActionText,
-    setInfoModalActionText,
-  ] = infoModal;
-
-  const [errorData, setErrorData, errorModalState, setErrorModalState] =
-    errorModal;
-
-  const [successData, setSuccessData, successModalState, setSuccessModalState] =
-    successModal;
+  const { errorModal, successModal } = useContext(Context);
 
   const [accessLevelName, setAccessLevelName] = useState("");
 
@@ -36,20 +18,16 @@ export const AccessLevelAdd = (props) => {
       );
 
       if (response.ok) {
-        setSuccessData("Access Level successfully added");
-        setSuccessModalState(true);
+        successModal.showSuccessModal("Access Level successfully added");
         props.closeAddAccessLevelModal();
       } else {
         const responseData = await response.json();
-        setErrorData(responseData);
-        setErrorModalState(true);
+        errorModal.showErrorModal(responseData);
       }
     } catch (error) {
-      console.error("Error adding access level:", error);
-      setErrorData({
+      errorModal.showErrorModal({
         message: "An error occurred while adding the access level.",
       });
-      setErrorModalState(true);
     }
   };
 

@@ -32,120 +32,161 @@ function App() {
   const [userName, setUserName] = useState("");
   const [userTitle, setUserTitle] = useState("");
   const [userId, setUserId] = useState(null);
-  const [accessLevelId, setAccessLevelId] = useState(null);
+  const [userAccessLevelId, setUserAccessLevelId] = useState(null);
 
-  const showSuccessModal = (message) => {
-    setSuccessData(message);
-    setSuccessModalState(true);
+  /**
+   * Displays an information modal with the provided heading, message, action function, and action text.
+   * @param {string} infoModalHeadingInput - The heading of the information modal.
+   * @param {string} infoModalMessageInput - The message displayed in the information modal.
+   * @param {Function} infoModalActionInput - The action function triggered by a button in the modal.
+   * @param {string} infoModalActionTextInput - The text displayed on the action button.
+   */
+  const showInfoModal = (
+    infoModalHeadingInput,
+    infoModalMessageInput,
+    infoModalActionInput,
+    infoModalActionTextInput
+  ) => {
+    setInfoModalHeading(infoModalHeadingInput);
+    setInfoModalMessage(infoModalMessageInput);
+    setInfoModalAction(() => infoModalActionInput);
+    setInfoModalActionText(infoModalActionTextInput);
+    setInfoModalState(true);
   };
 
+  /**
+   * Closes the information modal.
+   */
+  const closeInfoModal = () => {
+    setInfoModalState(false);
+  };
+
+  /**
+   * Object containing functions related to managing information modals.
+   */
+  const infoModal = {
+    showInfoModal,
+    closeInfoModal,
+  };
+
+  /**
+   * Displays an error modal with the provided message.
+   * @param {string} message - The error message to be displayed in the modal.
+   */
   const showErrorModal = (message) => {
     setErrorData(message);
     setErrorModalState(true);
   };
 
+  /**
+   * Closes the error modal.
+   */
+  const closeErrorModal = () => {
+    setErrorModalState(false);
+  };
+
+  /**
+   * Object containing functions related to managing error modals.
+   */
+  const errorModal = { showErrorModal, closeErrorModal };
+
+  /**
+   * Displays a success modal with the provided message.
+   * @param {string} message - The success message to be displayed in the modal.
+   */
+  const showSuccessModal = (message) => {
+    setSuccessData(message);
+    setSuccessModalState(true);
+  };
+
+  /**
+   * Closes the success modal.
+   */
+  const closeSuccessModal = () => {
+    setSuccessModalState(false);
+  };
+
+  /**
+   * Object containing functions related to managing success modals.
+   */
+  const successModal = { showSuccessModal, closeSuccessModal };
+
+  /**
+   * Sets user data including full name, username, title, user ID, and access level ID.
+   * @param {string} userFullName - The full name of the user.
+   * @param {string} userName - The username of the user.
+   * @param {string} userTitle - The title of the user.
+   * @param {string} userId - The ID of the user.
+   * @param {string} accessLevelId - The access level ID of the user.
+   */
+  const setUserData = (
+    userFullName,
+    userName,
+    userTitle,
+    userId,
+    accessLevelId
+  ) => {
+    setUserFullName(userFullName);
+    setUserName(userName);
+    setUserTitle(userTitle);
+    setUserId(userId);
+    setUserAccessLevelId(accessLevelId);
+  };
+
+  /**
+   * Object containing functions related to managing user data.
+   */
+  const userData = {
+    setUserData,
+    userId,
+    userAccessLevelId,
+    userFullName,
+    userTitle,
+    userName,
+  };
+
+  /**
+   * Displays a preview modal with the provided binary data, action function, file type, and file name.
+   * @param {any} binary - The binary data to be previewed.
+   * @param {Function} modalAction - The action function triggered by a button in the modal.
+   * @param {string} fileType - The type of the file being previewed.
+   * @param {string} fileName - The name of the file being previewed.
+   */
+  const showPreviewModal = (binary, modalAction, fileType, fileName) => {
+    setPreviewBinary(binary);
+    setPreviewModalAction(() => modalAction);
+    setPreviewFileType(fileType);
+    setPreviewFileName(fileName);
+    setPreviewModalState(true);
+  };
+
+  /**
+   * Closes the preview modal.
+   */
+  const closePreviewModal = () => {
+    setPreviewModalState(false);
+  };
+
+  /**
+   * Object containing functions related to managing preview modals.
+   */
+  const previewModal = { showPreviewModal, closePreviewModal, infoModalState };
+
   return (
     <Context.Provider
       value={{
-        infoModal: [
-          infoModalState,
-          setInfoModalState,
-          infoModalHeading,
-          setInfoModalHeading,
-          infoModalMessage,
-          setInfoModalMessage,
-          infoModalAction,
-          setInfoModalAction,
-          infoModalActionText,
-          setInfoModalActionText,
-        ],
-        errorModal: [
-          errorData,
-          setErrorData,
-          errorModalState,
-          setErrorModalState,
-        ],
-        successModal: [
-          successData,
-          setSuccessData,
-          successModalState,
-          setSuccessModalState,
-        ],
-        previewModal: [
-          previewModalState,
-          setPreviewModalState,
-          previewBinary,
-          setPreviewBinary,
-          previewModalAction,
-          setPreviewModalAction,
-          previewFileType,
-          setPreviewFileType,
-          previewFileName,
-          setPreviewFileName,
-        ],
-        userData: [
-          userFullName,
-          userName,
-          userTitle,
-          userId,
-          accessLevelId,
-          setUserFullName,
-          setUserName,
-          setUserTitle,
-          setUserId,
-          setAccessLevelId,
-        ],
+        infoModal,
+        errorModal,
+        successModal,
+        previewModal,
+        userData,
       }}>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route
-            path="/dashboard"
-            element={
-              <Dashboard
-                showSuccessModal={showSuccessModal}
-                showErrorModal={showErrorModal}
-                userId={userId}
-                accessLevelId={accessLevelId}
-                userFullName={userFullName}
-                userName={userName}
-                userTitle={userTitle}
-                setUserFullName={setUserFullName}
-                setUserName={setUserName}
-                setUserTitle={setUserTitle}
-                setAccessLevelId={setAccessLevelId}
-                setUserId={setUserId}
-              />
-            }
-          />
-          <Route
-            path="/admin"
-            element={
-              <Admin
-                showSuccessModal={showSuccessModal}
-                showErrorModal={showErrorModal}
-                userId={userId}
-                accessLevelId={accessLevelId}
-                userFullName={userFullName}
-                userName={userName}
-                userTitle={userTitle}
-                setUserFullName={setUserFullName}
-                setUserName={setUserName}
-                setUserTitle={setUserTitle}
-                setAccessLevelId={setAccessLevelId}
-                setUserId={setUserId}
-              />
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <Login
-                showSuccessModal={showSuccessModal}
-                showErrorModal={showErrorModal}
-              />
-            }
-          />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
 
         {previewModalState && (

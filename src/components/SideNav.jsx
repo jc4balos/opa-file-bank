@@ -1,15 +1,17 @@
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ListGroup, ProgressBar, Stack } from "react-bootstrap";
+import { Context } from "../App";
 import { StorageService } from "../service/StorageService";
 
 export const SideNav = (props) => {
   const [storages, setStorages] = useState([]);
+  const { userData, errorModal } = useContext(Context);
 
   useEffect(() => {
     fetchStorageInfo();
-  }, []);
+  });
 
   const fetchStorageInfo = async () => {
     const storageService = new StorageService();
@@ -19,15 +21,15 @@ export const SideNav = (props) => {
       setStorages(data);
     } else {
       const data = await response.json();
-      props.showErrorModal(data);
+      errorModal.showErrorModal(data);
     }
   };
 
   return (
     <Stack className="">
-      <span className="fw-bold text-center">{props.userFullName}</span>
-      <small className="text-center">{props.userTitle}</small>
-      <small className="text-muted text-center">@{props.userName}</small>
+      <span className="fw-bold text-center">{userData.userFullName}</span>
+      <small className="text-center">{userData.userTitle}</small>
+      <small className="text-muted text-center">@{userData.userName}</small>
 
       <ListGroup as="ul" className="mt-3">
         {storages.map((storage, index) => {

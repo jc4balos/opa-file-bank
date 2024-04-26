@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   Button,
   Card,
@@ -9,7 +9,7 @@ import {
   Form,
   Row,
 } from "react-bootstrap";
-
+import { Context } from "../App";
 import { Navigation } from "../components/Navigation";
 import { LoginService } from "../service/LoginService";
 
@@ -17,15 +17,14 @@ export const Login = (props) => {
   return (
     <div>
       <Navigation />
-      <LoginForm
-        showSuccessModal={props.showSuccessModal}
-        showErrorModal={props.showErrorModal}
-      />
+      <LoginForm />
     </div>
   );
 };
 
 const LoginForm = (props) => {
+  const { infoModal, errorModal, successModal, userData, previewModal } =
+    useContext(Context);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -40,16 +39,16 @@ const LoginForm = (props) => {
       const response = await loginService.login(data);
       if (response.ok) {
         const data = await response.json();
-        await props.showSuccessModal(data.message);
+        await successModal.showSuccessModal(data.message);
         setTimeout(() => {
           window.location.href = "/dashboard";
         }, 2000);
       } else {
         const data = await response.json();
-        await props.showErrorModal(data.message);
+        await errorModal.showErrorModal(data.message);
       }
     } catch (error) {
-      props.showErrorModal(JSON.stringify(error.message));
+      errorModal.showErrorModal(JSON.stringify(error.message));
     }
   };
 
