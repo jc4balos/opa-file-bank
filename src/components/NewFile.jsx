@@ -7,15 +7,17 @@ export const NewFile = (props) => {
   const [fileName, setFileName] = useState("");
   const [fileDescription, setFileDescription] = useState("");
   const fileInput = useRef();
-  const { errorModal, successModal } = useContext(Context);
+  const { errorModal, successModal, fullScreenLoading } = useContext(Context);
 
   const parentFolderId = props.currentFolderId;
 
   const addFile = async () => {
+    fullScreenLoading.show();
     const fileService = new FileService();
     const formData = new FormData();
     if (!fileInput.current.files[0]) {
       errorModal.showErrorModal("Please select a file to upload");
+      fullScreenLoading.close();
       return;
     }
     formData.append("multipartFile", fileInput.current.files[0]);
@@ -42,13 +44,13 @@ export const NewFile = (props) => {
       } else {
         const data = await response.json();
         const stringArray = data.map((item) => JSON.stringify(item));
-
         errorModal.showErrorModal(stringArray.join("\n"));
       }
     } catch (error) {
       errorModal.showErrorModal(JSON.stringify(error.message));
     } finally {
       props.fetchFilesAndFolders();
+      fullScreenLoading.close();
     }
   };
 

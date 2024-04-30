@@ -12,4 +12,12 @@ const BasicSpinner = () => {
   );
 };
 
-export { BasicSpinner };
+const FullScreenLoading = () => {
+  return (
+    <div className="loading-bg">
+      <BasicSpinner />
+    </div>
+  );
+};
+
+export { BasicSpinner, FullScreenLoading };

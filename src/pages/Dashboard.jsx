@@ -27,16 +27,14 @@ import { Navigation } from "../components/Navigation";
 import { NewFile } from "../components/NewFile";
 import { NewFolder } from "../components/NewFolder";
 import { SideNav } from "../components/SideNav";
-import { BasicSpinner } from "../components/Spinners";
 import "../css/global.css";
 import { FileService } from "../service/FileService";
 import { FolderService } from "../service/FolderService";
 import { SessionService } from "../service/SessionService";
 
 export const Dashboard = () => {
-  const { errorModal, userData } = useContext(Context);
+  const { errorModal, userData, fullScreenLoading } = useContext(Context);
 
-  const [isLoading, setIsLoading] = useState(true);
   const [currentFolderId, setCurrentFolderId] = useState(1);
 
   const [folderDirectory, setFolderDirectory] = useState([]);
@@ -46,7 +44,7 @@ export const Dashboard = () => {
 
   useEffect(() => {
     fetchSessionData();
-  });
+  }, []);
 
   useEffect(() => {
     if (userData.userId) {
@@ -55,12 +53,15 @@ export const Dashboard = () => {
   }, [currentFolderId, userData.userId, folderDirectory]);
 
   const fetchSessionData = async () => {
+    fullScreenLoading.show();
     const sessionService = new SessionService();
     const response = await sessionService.getSessionData();
 
     if (response.status !== 200 && location.pathname !== "/login") {
       const data = await response.json();
       errorModal.showErrorModal(data.message);
+      fullScreenLoading.close();
+
       setTimeout(() => {
         window.location.href = "/login";
       }, 3000);
@@ -73,6 +74,7 @@ export const Dashboard = () => {
         data.userId,
         data.accessLevelId
       );
+      fullScreenLoading.close();
 
       console.log(data);
     }
@@ -80,7 +82,7 @@ export const Dashboard = () => {
 
   const fetchFilesAndFolders = async () => {
     try {
-      setIsLoading(true);
+      fullScreenLoading.show();
       const folderService = new FolderService();
       const response = await folderService.getAllFilesInFolder(
         currentFolderId
@@ -88,16 +90,13 @@ export const Dashboard = () => {
       );
       setFiles(response.files);
       setFolders(response.folders);
+      fullScreenLoading.close();
     } catch (error) {
       errorModal.showErrorModal(JSON.stringify(error.message));
     } finally {
-      setIsLoading(false);
+      fullScreenLoading.close();
     }
   };
-
-  if (isLoading) {
-    return <BasicSpinner />;
-  }
 
   const handleFolderClick = (folderId) => {
     setCurrentFolderId(folderId);
@@ -248,8 +247,13 @@ const MainNavigation = (props) => {
 };
 
 const Content = (props) => {
-  const { infoModal, previewModal, errorModal, successModal } =
-    useContext(Context);
+  const {
+    infoModal,
+    previewModal,
+    errorModal,
+    successModal,
+    fullScreenLoading,
+  } = useContext(Context);
 
   const confirmDeleteFile = (onDelete) => {
     infoModal.showInfoModal(
@@ -261,19 +265,20 @@ const Content = (props) => {
   };
 
   const previewFile = async (fileId, action, fileName, fileType) => {
+    fullScreenLoading.show();
     const fileService = new FileService();
     const response = await fileService.downloadFile(fileId);
     if (response.status === 200) {
-      // const a = document.createElement("a");
-      // a.href = url;
       const data = await response.arrayBuffer(response);
       console.log("status 200");
       previewModal.showPreviewModal(data, action, fileType, fileName);
       URL.createObjectURL(new Blob([data]));
       console.log(data);
+      fullScreenLoading.close();
     } else {
       console.log(response.status);
       errorModal.showErrorModal("Failed to download file");
+      fullScreenLoading.close();
     }
   };
 
@@ -295,14 +300,17 @@ const Content = (props) => {
   };
 
   const deleteFile = (fileId) => {
+    fullScreenLoading.show();
     const fileService = new FileService();
     fileService.deleteFile(fileId).then((response) => {
       if (response.status === 200) {
         successModal.showSuccessModal("File Deleted Successfully");
         infoModal.closeInfoModal();
         props.fetchFilesAndFolders();
+        fullScreenLoading.close();
       } else {
         errorModal.showErrorModal("Failed to delete file");
+        fullScreenLoading.close();
       }
     });
   };

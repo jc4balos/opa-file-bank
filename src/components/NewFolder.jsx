@@ -6,11 +6,12 @@ import { FolderService } from "../service/FolderService";
 export const NewFolder = (props) => {
   const [folderName, setFolderName] = useState("");
   const [folderDescription, setFolderDescription] = useState("");
-  const { errorModal, successModal } = useContext(Context);
+  const { errorModal, successModal, fullScreenLoading } = useContext(Context);
 
   const parentFolderId = props.currentFolderId;
 
   const addFolder = async () => {
+    fullScreenLoading.show();
     const folderService = new FolderService();
     const data = {
       folderName: folderName,
@@ -32,6 +33,7 @@ export const NewFolder = (props) => {
       errorModal.showErrorModal(JSON.stringify(error.message));
     } finally {
       props.fetchFilesAndFolders();
+      fullScreenLoading.close();
     }
   };
 

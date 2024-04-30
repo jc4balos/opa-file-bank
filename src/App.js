@@ -4,6 +4,7 @@ import "./App.css";
 import { ErrorModal } from "./components/ErrorModal";
 import { InfoModal } from "./components/InfoModal";
 import { PreviewFile } from "./components/Preview";
+import { FullScreenLoading } from "./components/Spinners";
 import { SuccessModal } from "./components/SuccessModal";
 import { Admin } from "./pages/Admin";
 import { Dashboard } from "./pages/Dashboard";
@@ -16,6 +17,9 @@ function App() {
   const [errorData, setErrorData] = useState([]);
   const [successModalState, setSuccessModalState] = useState(false);
   const [successData, setSuccessData] = useState([]);
+  const [showSuccessModalLoading, setSuccessModalLoading] = useState(false);
+  const [showErrorModalLoading, setErrorModalLoading] = useState(false);
+
   const [infoModalState, setInfoModalState] = useState(false);
   const [infoModalHeading, setInfoModalHeading] = useState("");
   const [infoModalMessage, setInfoModalMessage] = useState("");
@@ -33,6 +37,31 @@ function App() {
   const [userTitle, setUserTitle] = useState("");
   const [userId, setUserId] = useState(null);
   const [userAccessLevelId, setUserAccessLevelId] = useState(null);
+
+  const [isFullScreenLoading, setIsFullScreenLoading] = useState(false);
+
+  /**
+   * Displays a full-screen loading indicator.
+   * This function sets the state to show a full-screen loading indicator, indicating to the user that the application is currently loading content or performing an operation.
+   */
+  const show = () => {
+    setIsFullScreenLoading(true);
+    console.log("showed");
+  };
+
+  /**
+   * Hides the full-screen loading indicator.
+   * This function sets the state to hide the full-screen loading indicator, indicating to the user that the loading process has completed or the operation has finished.
+   */
+  const close = () => {
+    setIsFullScreenLoading(false);
+    console.log("hidden");
+  };
+
+  /**
+   * Object containing functions related to managing full-screen loading indicators.
+   */
+  const fullScreenLoading = { show, close };
 
   /**
    * Displays an information modal with the provided heading, message, action function, and action text.
@@ -72,9 +101,11 @@ function App() {
   /**
    * Displays an error modal with the provided message.
    * @param {string} message - The error message to be displayed in the modal.
+   * @param {boolean} loading - Set if loading icon will be displayed on modal
    */
-  const showErrorModal = (message) => {
+  const showErrorModal = (message, loading) => {
     setErrorData(message);
+    setErrorModalLoading(loading);
     setErrorModalState(true);
   };
 
@@ -93,9 +124,11 @@ function App() {
   /**
    * Displays a success modal with the provided message.
    * @param {string} message - The success message to be displayed in the modal.
+   * @param {boolean} loading - Set if loading icon will be displayed on modal
    */
-  const showSuccessModal = (message) => {
+  const showSuccessModal = (message, loading) => {
     setSuccessData(message);
+    setSuccessModalLoading(loading);
     setSuccessModalState(true);
   };
 
@@ -180,8 +213,11 @@ function App() {
         successModal,
         previewModal,
         userData,
+        fullScreenLoading,
       }}>
       <BrowserRouter>
+        {isFullScreenLoading && <FullScreenLoading className="d-block" />}
+
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
@@ -209,6 +245,7 @@ function App() {
             }}
             errorModalHeading={"Error"}
             errorMessages={errorData}
+            showErrorModalLoading={showErrorModalLoading}
           />
         )}
         {successModalState && (
@@ -219,6 +256,7 @@ function App() {
             }}
             successModalHeading={"Success"}
             successMessages={successData}
+            showSuccessModalLoading={showSuccessModalLoading}
           />
         )}
         {infoModalState && (

@@ -1,6 +1,7 @@
 import { React, useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import { BasicSpinner } from "./Spinners";
 
 const ErrorModal = (props) => {
   const [errorMessages, setErrorMessages] = useState(props.errorMessages);
@@ -33,6 +34,18 @@ const ErrorModal = (props) => {
           </ul>
         ) : (
           <p>{errorMessages}</p>
+        )}
+
+        {props.showErrorModalLoading && (
+          <div
+            className="d-flex align-items-center justify-content-center"
+            style={{
+              height: "30vh",
+              fontSize: "10px",
+              transform: "scale(2, 2)",
+            }}>
+            <BasicSpinner />
+          </div>
         )}
       </Modal.Body>
       <Modal.Footer>

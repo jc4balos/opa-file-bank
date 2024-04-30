@@ -1,5 +1,6 @@
 import { React, useEffect, useState } from "react";
-import { Button, Modal, Spinner } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
+import { BasicSpinner } from "./Spinners";
 
 const SuccessModal = (props) => {
   const [successMessages, setSuccessMessages] = useState(props.successMessages);
@@ -33,9 +34,18 @@ const SuccessModal = (props) => {
         ) : (
           <p>{successMessages}</p>
         )}
-        <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </Spinner>
+
+        {props.showSuccessModalLoading && (
+          <div
+            className="d-flex align-items-center justify-content-center"
+            style={{
+              height: "30vh",
+              fontSize: "10px",
+              transform: "scale(2, 2)",
+            }}>
+            <BasicSpinner />
+          </div>
+        )}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={props.closeSuccessModal}>

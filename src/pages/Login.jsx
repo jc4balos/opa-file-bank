@@ -23,12 +23,18 @@ export const Login = (props) => {
 };
 
 const LoginForm = (props) => {
-  const { infoModal, errorModal, successModal, userData, previewModal } =
-    useContext(Context);
+  const {
+    errorModal,
+    successModal,
+    userData,
+    previewModal,
+    fullScreenLoading,
+  } = useContext(Context);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const submitLogin = async (event) => {
+    fullScreenLoading.show();
     event.preventDefault();
     const data = {
       userName: username,
@@ -39,16 +45,19 @@ const LoginForm = (props) => {
       const response = await loginService.login(data);
       if (response.ok) {
         const data = await response.json();
-        await successModal.showSuccessModal(data.message);
+        await successModal.showSuccessModal(data.message, true);
+        fullScreenLoading.close();
         setTimeout(() => {
           window.location.href = "/dashboard";
         }, 2000);
       } else {
         const data = await response.json();
         await errorModal.showErrorModal(data.message);
+        fullScreenLoading.close();
       }
     } catch (error) {
       errorModal.showErrorModal(JSON.stringify(error.message));
+      fullScreenLoading.close();
     }
   };
 
