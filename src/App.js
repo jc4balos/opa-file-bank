@@ -46,7 +46,6 @@ function App() {
    */
   const show = () => {
     setIsFullScreenLoading(true);
-    console.log("showed");
   };
 
   /**
@@ -55,7 +54,6 @@ function App() {
    */
   const close = () => {
     setIsFullScreenLoading(false);
-    console.log("hidden");
   };
 
   /**

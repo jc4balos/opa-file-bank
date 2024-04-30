@@ -74,8 +74,6 @@ export const Dashboard = () => {
         data.accessLevelId
       );
       fullScreenLoading.close();
-
-      console.log(data);
     }
   };
 
@@ -218,6 +216,7 @@ const MainNavigation = (props) => {
 
       <Form>
         <Button
+          variant="outline-secondary"
           onClick={() => {
             setNewFileModalState(true);
           }}
@@ -227,6 +226,7 @@ const MainNavigation = (props) => {
         </Button>
 
         <Button
+          variant="outline-secondary"
           onClick={() => {
             setNewFolderModalState(true);
           }}
@@ -263,13 +263,10 @@ const Content = (props) => {
     const response = await fileService.downloadFile(fileId);
     if (response.status === 200) {
       const data = await response.arrayBuffer(response);
-      console.log("status 200");
       previewModal.showPreviewModal(data, action, fileType, fileName);
       URL.createObjectURL(new Blob([data]));
-      console.log(data);
       fullScreenLoading.close();
     } else {
-      console.log(response.status);
       errorModal.showErrorModal("Failed to download file");
       fullScreenLoading.close();
     }
