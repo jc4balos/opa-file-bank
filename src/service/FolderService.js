@@ -1,12 +1,11 @@
 import { backendUrl } from "../config/config";
 
 export class FolderService {
-  async getAllFilesInFolder(folderId, userId) {
+  async getAllFilesInFolder(folderId) {
     try {
       const url = new URL(backendUrl + "/api/v1/folder/get-all-files");
       const params = new URLSearchParams({
         folderId: folderId,
-        userId: userId,
       });
 
       url.search = params;
