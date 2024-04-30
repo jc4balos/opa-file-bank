@@ -85,7 +85,6 @@ export const Dashboard = () => {
       const response = await folderService.getAllFilesInFolder(currentFolderId);
       setFiles(response.files);
       setFolders(response.folders);
-      fullScreenLoading.close();
     } catch (error) {
       errorModal.showErrorModal(JSON.stringify(error.message));
     } finally {
