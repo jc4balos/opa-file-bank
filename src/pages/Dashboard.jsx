@@ -20,7 +20,7 @@ import {
   Row,
   Tooltip,
 } from "react-bootstrap";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { Context } from "../App";
 import { InfoModal } from "../components/InfoModal";
 import { Navigation } from "../components/Navigation";
@@ -33,14 +33,30 @@ import { FolderService } from "../service/FolderService";
 import { SessionService } from "../service/SessionService";
 
 export const Dashboard = () => {
+  const { folderId } = useParams();
   const { errorModal, userData, fullScreenLoading } = useContext(Context);
 
-  const [currentFolderId, setCurrentFolderId] = useState(1);
-
+  const [currentFolderId, setCurrentFolderId] = useState(folderId);
   const [folderDirectory, setFolderDirectory] = useState([]);
+
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
   const location = useLocation();
+
+  const setPrevFolderId = () => {
+    if (folderDirectory.length > 1) {
+      const arrayIndex = folderDirectory.length - 2;
+      const folderId = folderDirectory[arrayIndex].folderId;
+      setCurrentFolderId(folderId);
+      fetchFilesAndFolders();
+      console.log(folderDirectory);
+      console.log("executed", folderId, folderDirectory[arrayIndex].folderName);
+    } else {
+      setCurrentFolderId(1);
+      fetchFilesAndFolders();
+      console.log("executed", 1);
+    }
+  };
 
   useEffect(() => {
     fetchSessionData();
@@ -107,12 +123,12 @@ export const Dashboard = () => {
     setFolderDirectory([]);
   };
 
-  //modify this
-  const removeDirectoryAfterIndex = (index) => {
-    setFolderDirectory((prevFolderDirectory) =>
-      prevFolderDirectory.slice(0, index + 1)
-    );
-  };
+  // //modify this
+  // const removeDirectoryAfterIndex = (index) => {
+  //   setFolderDirectory((prevFolderDirectory) =>
+  //     prevFolderDirectory.slice(0, index + 1)
+  //   );
+  // };
 
   return (
     <div>
@@ -127,22 +143,18 @@ export const Dashboard = () => {
               currentFolderId={currentFolderId}
               setCurrentFolderId={setCurrentFolderId}
               folderDirectory={folderDirectory}
-              resetDirectory={resetDirectory}
-              removeDirectoryAfterIndex={removeDirectoryAfterIndex}
               folders={folders}
               files={files}
               setFolders={setFolders}
               setFiles={setFiles}
               handleFolderClick={handleFolderClick}
               fetchFilesAndFolders={fetchFilesAndFolders}
+              setPrevFolderId={setPrevFolderId}
             />
             <Content
               currentFolderId={currentFolderId}
               fetchFilesAndFolders={fetchFilesAndFolders}
               setCurrentFolderId={setCurrentFolderId}
-              addFolderOnDirectory={addFolderOnDirectory}
-              resetDirectory={resetDirectory}
-              removeDirectoryAfterIndex={removeDirectoryAfterIndex}
               folders={folders}
               files={files}
               setFolders={setFolders}
@@ -159,12 +171,6 @@ export const Dashboard = () => {
 const MainNavigation = (props) => {
   const [newFolderModalState, setNewFolderModalState] = useState(false);
   const [newFileModalState, setNewFileModalState] = useState(false);
-
-  const backButton = () => {
-    console.log(props.folderDirectory);
-    console.log(props.folderDirectory.length);
-    // if(props.folderDirectory.length >)
-  };
 
   return (
     <div>
@@ -205,8 +211,7 @@ const MainNavigation = (props) => {
                   className="d-flex align-items-center"
                   key={index}
                   onClick={() => {
-                    props.setCurrentFolderId(folder.folderId);
-                    props.removeDirectoryAfterIndex(index);
+                    //execute go to folder
                   }}>
                   <div
                     className="text-truncate btn "
@@ -226,7 +231,7 @@ const MainNavigation = (props) => {
           style={{ fontSize: "30px" }}
           icon={faArrowUpFromBracket}
           onClick={() => {
-            backButton();
+            props.setPrevFolderId();
           }}
         />
         <Button
@@ -341,11 +346,7 @@ const Content = (props) => {
                 }>
                 <Card
                   onDoubleClick={() => {
-                    props.handleFolderClick(folder.folderId);
-                    props.addFolderOnDirectory(
-                      folder.folderId,
-                      folder.folderName
-                    );
+                    //execute go to folder
                   }}
                   className="zoom-on-hover bg-light p-2 m-1">
                   <div className="d-flex justify-content-between align-items-center">
