@@ -23,6 +23,28 @@ export class FolderService {
     }
   }
 
+  async getFolder(folderId) {
+    try {
+      const url = new URL(backendUrl + "/api/v1/folder/get-folder");
+      const params = new URLSearchParams({
+        folderId: folderId,
+      });
+
+      url.search = params;
+
+      const response = await fetch(url, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return response.json();
+    } catch (error) {
+      return error;
+    }
+  }
+
   async addFolder(data) {
     console.log(
       "service",
