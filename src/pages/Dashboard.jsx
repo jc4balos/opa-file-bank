@@ -1,4 +1,5 @@
 import {
+  faArrowUpFromBracket,
   faDownload,
   faEye,
   faFile,
@@ -160,6 +161,12 @@ const MainNavigation = (props) => {
   const [newFolderModalState, setNewFolderModalState] = useState(false);
   const [newFileModalState, setNewFileModalState] = useState(false);
 
+  const backButton = () => {
+    console.log(props.folderDirectory);
+    console.log(props.folderDirectory.length);
+    // if(props.folderDirectory.length >)
+  };
+
   return (
     <div>
       {newFolderModalState && (
@@ -214,7 +221,15 @@ const MainNavigation = (props) => {
         </div>
       </div>
 
-      <Form>
+      <Form className="d-flex align-items-center">
+        <FontAwesomeIcon
+          className="zoom-on-hover"
+          style={{ fontSize: "30px" }}
+          icon={faArrowUpFromBracket}
+          onClick={() => {
+            backButton();
+          }}
+        />
         <Button
           variant="outline-secondary"
           onClick={() => {
@@ -224,7 +239,6 @@ const MainNavigation = (props) => {
           <FontAwesomeIcon icon={faPlus} />
           <span>New File</span>
         </Button>
-
         <Button
           variant="outline-secondary"
           onClick={() => {
