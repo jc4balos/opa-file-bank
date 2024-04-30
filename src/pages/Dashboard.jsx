@@ -1,5 +1,4 @@
 import {
-  faArrowUpFromBracket,
   faDownload,
   faEye,
   faFile,
@@ -59,7 +58,7 @@ export const Dashboard = () => {
 
     if (response.status !== 200 && location.pathname !== "/login") {
       const data = await response.json();
-      errorModal.showErrorModal(data.message);
+      errorModal.showErrorModal(data.message, true);
       fullScreenLoading.close();
 
       setTimeout(() => {
@@ -84,10 +83,7 @@ export const Dashboard = () => {
     try {
       fullScreenLoading.show();
       const folderService = new FolderService();
-      const response = await folderService.getAllFilesInFolder(
-        currentFolderId
-        // userData.userId
-      );
+      const response = await folderService.getAllFilesInFolder(currentFolderId);
       setFiles(response.files);
       setFolders(response.folders);
       fullScreenLoading.close();
@@ -189,33 +185,30 @@ const MainNavigation = (props) => {
       )}
 
       <div className="d-flex align-items gap-1">
-        <div className="zoom-on-hover">
-          <FontAwesomeIcon
-            onClick={() => {
-              //backbutton function
-            }}
-            style={{ fontSize: "40px" }}
-            icon={faArrowUpFromBracket}
-          />
-        </div>
         <div className="d-flex align-self-center">
           <Breadcrumb>
             <Breadcrumb.Item
+              className="d-flex align-items-center"
               onClick={() => {
                 props.setCurrentFolderId(1);
                 props.resetDirectory();
               }}>
-              root
+              OPA File Bank
             </Breadcrumb.Item>
             {props.folderDirectory.map((folder, index) => {
               return (
                 <Breadcrumb.Item
+                  className="d-flex align-items-center"
                   key={index}
                   onClick={() => {
                     props.setCurrentFolderId(folder.folderId);
                     props.removeDirectoryAfterIndex(index);
                   }}>
-                  {folder.folderName}
+                  <div
+                    className="text-truncate btn "
+                    style={{ width: "150px" }}>
+                    {folder.folderName}
+                  </div>
                 </Breadcrumb.Item>
               );
             })}

@@ -34,7 +34,7 @@ export const Admin = (props) => {
 
       if (response.status !== 200 && location.pathname !== "/login") {
         const data = await response.json();
-        errorModal.showErrorModal(data.message);
+        errorModal.showErrorModal(data.message, true);
         setTimeout(() => {
           window.location.href = "/login";
         }, 3000);
