@@ -9,6 +9,7 @@ import { SuccessModal } from "./components/SuccessModal";
 import { Admin } from "./pages/Admin";
 import { Dashboard } from "./pages/Dashboard";
 import { Login } from "./pages/Login";
+import { SessionService } from "./service/SessionService";
 
 export const Context = React.createContext();
 
@@ -203,6 +204,42 @@ function App() {
    */
   const previewModal = { showPreviewModal, closePreviewModal, infoModalState };
 
+  /**
+   * Fetches session data from the server and handles the response accordingly.
+   *
+   * @param {Location} location - The location object representing the current browser URL.
+   * @returns {Promise<void>} - A promise that resolves when the session data is fetched and processed.
+   */
+  const fetchSessionData = async (location) => {
+    fullScreenLoading.show();
+    const sessionService = new SessionService();
+    const response = await sessionService.getSessionData();
+
+    if (response.status !== 200 && location.pathname !== "/login") {
+      const data = await response.json();
+      errorModal.showErrorModal(data.message, true);
+      fullScreenLoading.close();
+
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 3000);
+    } else {
+      const data = await response.json();
+      await userData.setUserData(
+        data.userFullName,
+        data.userName,
+        data.userFullName,
+        data.userId,
+        data.accessLevelId
+      );
+      console.log(data);
+
+      fullScreenLoading.close();
+    }
+  };
+
+  const session = { fetchSessionData };
+
   return (
     <Context.Provider
       value={{
@@ -212,12 +249,18 @@ function App() {
         previewModal,
         userData,
         fullScreenLoading,
+        session,
       }}>
       <BrowserRouter>
         {isFullScreenLoading && <FullScreenLoading className="d-block" />}
 
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Navigate to="/dashboard/1" replace />} />
+          <Route
+            path="/dashboard"
+            element={<Navigate to="/dashboard/1" replace />}
+          />
+
           <Route path="/dashboard/:folderId" element={<Dashboard />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/login" element={<Login />} />

@@ -30,105 +30,67 @@ import { SideNav } from "../components/SideNav";
 import "../css/global.css";
 import { FileService } from "../service/FileService";
 import { FolderService } from "../service/FolderService";
-import { SessionService } from "../service/SessionService";
 
 export const Dashboard = () => {
-  const { folderId } = useParams();
-  const { errorModal, userData, fullScreenLoading } = useContext(Context);
+  const location = useLocation();
 
-  const [currentFolderId, setCurrentFolderId] = useState(folderId);
-  const [folderDirectory, setFolderDirectory] = useState([]);
+  const { folderId } = useParams();
+  const { errorModal, userData, fullScreenLoading, session } =
+    useContext(Context);
 
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
-  const location = useLocation();
-
-  const setPrevFolderId = () => {
-    if (folderDirectory.length > 1) {
-      const arrayIndex = folderDirectory.length - 2;
-      const folderId = folderDirectory[arrayIndex].folderId;
-      setCurrentFolderId(folderId);
-      fetchFilesAndFolders();
-      console.log(folderDirectory);
-      console.log("executed", folderId, folderDirectory[arrayIndex].folderName);
-    } else {
-      setCurrentFolderId(1);
-      fetchFilesAndFolders();
-      console.log("executed", 1);
-    }
-  };
+  const [backButtonFolderId, setBackButtonFolderId] = useState(null);
 
   useEffect(() => {
-    fetchSessionData();
-  }, []);
+    session.fetchSessionData(location);
 
-  useEffect(() => {
     if (userData.userId) {
       fetchFilesAndFolders();
     }
-  }, [currentFolderId, userData.userId, folderDirectory]);
+  }, [userData.userId]);
 
-  const fetchSessionData = async () => {
-    fullScreenLoading.show();
-    const sessionService = new SessionService();
-    const response = await sessionService.getSessionData();
+  const goToFolder = async (folderId) => {
+    window.history.replaceState(null, "OPA File Bank", `/${folderId}`);
+    // window.location = folderId;
+  };
 
-    if (response.status !== 200 && location.pathname !== "/login") {
+  const goBackOneFolderUp = () => {
+    goToFolder(backButtonFolderId);
+  };
+
+  const setFolderParentId = async (currentFolderId) => {
+    console.log("executed folderparentid:", currentFolderId);
+    const folderService = new FolderService();
+    const response = await folderService.getFolder(currentFolderId);
+    if (response.ok) {
+      console.log(response);
       const data = await response.json();
-      errorModal.showErrorModal(data.message, true);
-      fullScreenLoading.close();
-
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 3000);
+      localStorage.setItem("folderParentId", data.folderParentId);
+      setBackButtonFolderId(localStorage.getItem("folderParentId"));
     } else {
       const data = await response.json();
-      userData.setUserData(
-        data.userFullName,
-        data.userName,
-        data.userFullName,
-        data.userId,
-        data.accessLevelId
-      );
-      fullScreenLoading.close();
+      errorModal.showErrorModal(data, false);
+      console.log(data);
     }
   };
 
   const fetchFilesAndFolders = async () => {
     try {
       fullScreenLoading.show();
+      const currentFolderId = await folderId;
+      console.log(currentFolderId);
       const folderService = new FolderService();
       const response = await folderService.getAllFilesInFolder(currentFolderId);
       setFiles(response.files);
       setFolders(response.folders);
+      setFolderParentId(currentFolderId);
     } catch (error) {
       errorModal.showErrorModal(JSON.stringify(error.message));
     } finally {
       fullScreenLoading.close();
     }
   };
-
-  const handleFolderClick = (folderId) => {
-    setCurrentFolderId(folderId);
-  };
-
-  const addFolderOnDirectory = (folderId, folderName) => {
-    setFolderDirectory([
-      ...folderDirectory,
-      { folderId: folderId, folderName: folderName },
-    ]);
-  };
-
-  const resetDirectory = () => {
-    setFolderDirectory([]);
-  };
-
-  // //modify this
-  // const removeDirectoryAfterIndex = (index) => {
-  //   setFolderDirectory((prevFolderDirectory) =>
-  //     prevFolderDirectory.slice(0, index + 1)
-  //   );
-  // };
 
   return (
     <div>
@@ -140,26 +102,22 @@ export const Dashboard = () => {
           </Col>
           <Col lg="10">
             <MainNavigation
-              currentFolderId={currentFolderId}
-              setCurrentFolderId={setCurrentFolderId}
-              folderDirectory={folderDirectory}
               folders={folders}
               files={files}
               setFolders={setFolders}
               setFiles={setFiles}
-              handleFolderClick={handleFolderClick}
               fetchFilesAndFolders={fetchFilesAndFolders}
-              setPrevFolderId={setPrevFolderId}
+              goToFolder={goToFolder}
+              setFolderParentId={setFolderParentId}
+              goBackOneFolderUp={goBackOneFolderUp}
             />
             <Content
-              currentFolderId={currentFolderId}
               fetchFilesAndFolders={fetchFilesAndFolders}
-              setCurrentFolderId={setCurrentFolderId}
               folders={folders}
               files={files}
               setFolders={setFolders}
               setFiles={setFiles}
-              handleFolderClick={handleFolderClick}
+              goToFolder={goToFolder}
             />
           </Col>
         </Row>
@@ -200,38 +158,21 @@ const MainNavigation = (props) => {
             <Breadcrumb.Item
               className="d-flex align-items-center"
               onClick={() => {
-                props.setCurrentFolderId(1);
-                props.resetDirectory();
+                props.goToFolder(1);
               }}>
               OPA File Bank
             </Breadcrumb.Item>
-            {props.folderDirectory.map((folder, index) => {
-              return (
-                <Breadcrumb.Item
-                  className="d-flex align-items-center"
-                  key={index}
-                  onClick={() => {
-                    //execute go to folder
-                  }}>
-                  <div
-                    className="text-truncate btn "
-                    style={{ width: "150px" }}>
-                    {folder.folderName}
-                  </div>
-                </Breadcrumb.Item>
-              );
-            })}
           </Breadcrumb>
         </div>
       </div>
 
       <Form className="d-flex align-items-center">
         <FontAwesomeIcon
-          className="zoom-on-hover"
+          className="zoom-on-hover me-2"
           style={{ fontSize: "30px" }}
           icon={faArrowUpFromBracket}
           onClick={() => {
-            props.setPrevFolderId();
+            props.goBackOneFolderUp();
           }}
         />
         <Button
@@ -346,7 +287,7 @@ const Content = (props) => {
                 }>
                 <Card
                   onDoubleClick={() => {
-                    //execute go to folder
+                    props.goToFolder(folder.folderId);
                   }}
                   className="zoom-on-hover bg-light p-2 m-1">
                   <div className="d-flex justify-content-between align-items-center">

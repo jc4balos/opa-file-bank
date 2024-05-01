@@ -39,7 +39,7 @@ export class FolderService {
           "Content-Type": "application/json",
         },
       });
-      return response.json();
+      return response;
     } catch (error) {
       return error;
     }

@@ -10,10 +10,7 @@ export const Navigation = () => {
   const sessionId = Cookies.get("SESSION");
 
   const logOut = () => {
-    console.log("removed session");
-
     Cookies.remove("SESSION");
-
     window.location.href = "/login";
   };
 
