@@ -46,13 +46,17 @@ export const Dashboard = () => {
     session.fetchSessionData(location);
 
     if (userData.userId) {
-      fetchFilesAndFolders();
+      fetchFilesAndFolders(folderId);
     }
   }, [userData.userId]);
 
   const goToFolder = async (folderId) => {
-    window.history.replaceState(null, "OPA File Bank", `/${folderId}`);
-    // window.location = folderId;
+    window.history.replaceState(
+      null,
+      "OPA File Bank",
+      `/dashboard/${folderId}`
+    );
+    fetchFilesAndFolders(folderId);
   };
 
   const goBackOneFolderUp = () => {
@@ -75,16 +79,14 @@ export const Dashboard = () => {
     }
   };
 
-  const fetchFilesAndFolders = async () => {
+  const fetchFilesAndFolders = async (folderId) => {
     try {
       fullScreenLoading.show();
-      const currentFolderId = await folderId;
-      console.log(currentFolderId);
       const folderService = new FolderService();
-      const response = await folderService.getAllFilesInFolder(currentFolderId);
+      const response = await folderService.getAllFilesInFolder(folderId);
       setFiles(response.files);
       setFolders(response.folders);
-      setFolderParentId(currentFolderId);
+      setFolderParentId(folderId);
     } catch (error) {
       errorModal.showErrorModal(JSON.stringify(error.message));
     } finally {
