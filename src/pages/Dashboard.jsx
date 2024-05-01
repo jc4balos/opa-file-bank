@@ -64,18 +64,15 @@ export const Dashboard = () => {
   };
 
   const setFolderParentId = async (currentFolderId) => {
-    console.log("executed folderparentid:", currentFolderId);
     const folderService = new FolderService();
     const response = await folderService.getFolder(currentFolderId);
     if (response.ok) {
-      console.log(response);
       const data = await response.json();
       localStorage.setItem("folderParentId", data.folderParentId);
       setBackButtonFolderId(localStorage.getItem("folderParentId"));
     } else {
       const data = await response.json();
       errorModal.showErrorModal(data, false);
-      console.log(data);
     }
   };
 
