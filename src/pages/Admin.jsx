@@ -20,38 +20,15 @@ import { UserAdd } from "../components/UserAdd";
 import { UserEdit } from "../components/UserEdit";
 import "../css/global.css";
 import { AccessLevelService } from "../service/AccessLevelService";
-import { SessionService } from "../service/SessionService";
 import { UserService } from "../service/UserService";
-export const Admin = (props) => {
-  const { errorModal, userData } = useContext(Context);
+export const Admin = () => {
+  const { errorModal, userData, session } = useContext(Context);
 
   const location = useLocation();
 
   useEffect(() => {
-    const fetchSessionData = async () => {
-      const sessionService = new SessionService();
-      const response = await sessionService.getSessionData();
-
-      if (response.status !== 200 && location.pathname !== "/login") {
-        const data = await response.json();
-        errorModal.showErrorModal(data.message, true);
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 3000);
-      } else {
-        const data = await response.json();
-        userData.setUserData(
-          data.userFullName,
-          data.userName,
-          data.userFullName,
-          data.userId,
-          data.accessLevelId
-        );
-      }
-    };
-
-    fetchSessionData();
-  });
+    session.fetchSessionData(location);
+  }, []);
 
   return (
     <div>
@@ -70,7 +47,7 @@ export const Admin = (props) => {
   );
 };
 
-const AdminNavigation = (props) => {
+const AdminNavigation = () => {
   return (
     <Tabs defaultActiveKey="users" id="admin-navigation" className="mb-3 mt-3">
       <Tab eventKey="users" title="Users">
@@ -86,7 +63,7 @@ const AdminNavigation = (props) => {
   );
 };
 
-const UsersContentAdmin = (props) => {
+const UsersContentAdmin = () => {
   const { errorModal, successModal, infoModal } = useContext(Context);
 
   const [userEditModalState, setUserEditModalState] = useState(false);
@@ -105,7 +82,7 @@ const UsersContentAdmin = (props) => {
 
   useEffect(() => {
     fetchUsers();
-  });
+  }, []);
 
   const fetchUsers = async () => {
     const userService = new UserService();
