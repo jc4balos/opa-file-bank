@@ -247,14 +247,14 @@ const Content = (props) => {
     });
   };
 
-  const deleteFile = (fileId) => {
+  const deleteFile = (fileId, currentFolderId) => {
     fullScreenLoading.show();
     const fileService = new FileService();
     fileService.deleteFile(fileId).then((response) => {
       if (response.status === 200) {
         successModal.showSuccessModal("File Deleted Successfully");
         infoModal.closeInfoModal();
-        props.fetchFilesAndFolders();
+        props.fetchFilesAndFolders(currentFolderId);
         fullScreenLoading.close();
       } else {
         errorModal.showErrorModal("Failed to delete file");
@@ -393,7 +393,9 @@ const Content = (props) => {
                       <FontAwesomeIcon
                         className="zoom-on-hover "
                         onClick={() => {
-                          confirmDeleteFile(() => deleteFile(file.fileId));
+                          confirmDeleteFile(() =>
+                            deleteFile(file.fileId, file.folderId)
+                          );
                         }}
                         style={{ fontSize: "30px" }}
                         icon={faTrash}
