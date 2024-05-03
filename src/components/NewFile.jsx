@@ -1,6 +1,6 @@
 import React, { useContext, useRef, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
-import { Context } from "../App";
+import { Context, FolderContext } from "../App";
 import { FileService } from "../service/FileService";
 
 export const NewFile = (props) => {
@@ -8,8 +8,8 @@ export const NewFile = (props) => {
   const [fileDescription, setFileDescription] = useState("");
   const fileInput = useRef();
   const { errorModal, successModal, fullScreenLoading } = useContext(Context);
-
-  const parentFolderId = props.currentFolderId;
+  const { folderId } = useContext(FolderContext);
+  const currentFolderId = parseInt(folderId);
 
   const addFile = async () => {
     fullScreenLoading.show();
@@ -33,7 +33,7 @@ export const NewFile = (props) => {
     }
 
     formData.append("description", fileDescription);
-    formData.append("folderId", parentFolderId);
+    formData.append("folderId", currentFolderId);
 
     try {
       const response = await fileService.uploadFile(formData);
@@ -49,7 +49,7 @@ export const NewFile = (props) => {
     } catch (error) {
       errorModal.showErrorModal(JSON.stringify(error.message));
     } finally {
-      props.fetchFilesAndFolders();
+      props.fetchFilesAndFolders(folderId);
       fullScreenLoading.close();
     }
   };

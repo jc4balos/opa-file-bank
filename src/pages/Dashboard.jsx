@@ -8,7 +8,7 @@ import {
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Breadcrumb,
   Button,
@@ -21,7 +21,7 @@ import {
   Tooltip,
 } from "react-bootstrap";
 import { useLocation, useParams } from "react-router-dom";
-import { Context } from "../App";
+import { Context, FolderContext } from "../App";
 import { InfoModal } from "../components/InfoModal";
 import { Navigation } from "../components/Navigation";
 import { NewFile } from "../components/NewFile";
@@ -92,7 +92,7 @@ export const Dashboard = () => {
   };
 
   return (
-    <div>
+    <FolderContext.Provider value={{ folderId, files, folders }}>
       <Navigation />
       <div className="m-lg-3 m-1">
         <Row>
@@ -101,8 +101,6 @@ export const Dashboard = () => {
           </Col>
           <Col lg="10">
             <MainNavigation
-              folders={folders}
-              files={files}
               setFolders={setFolders}
               setFiles={setFiles}
               fetchFilesAndFolders={fetchFilesAndFolders}
@@ -112,8 +110,6 @@ export const Dashboard = () => {
             />
             <Content
               fetchFilesAndFolders={fetchFilesAndFolders}
-              folders={folders}
-              files={files}
               setFolders={setFolders}
               setFiles={setFiles}
               goToFolder={goToFolder}
@@ -121,7 +117,7 @@ export const Dashboard = () => {
           </Col>
         </Row>
       </div>
-    </div>
+    </FolderContext.Provider>
   );
 };
 
@@ -134,7 +130,6 @@ const MainNavigation = (props) => {
       {newFolderModalState && (
         <NewFolder
           showNewFolderModal={setNewFolderModalState}
-          currentFolderId={props.currentFolderId}
           fetchFilesAndFolders={props.fetchFilesAndFolders}
           closeNewFolderModal={() => {
             setNewFolderModalState(false);
@@ -144,7 +139,6 @@ const MainNavigation = (props) => {
       {newFileModalState && (
         <NewFile
           showNewFileModal={setNewFileModalState}
-          currentFolderId={props.currentFolderId}
           fetchFilesAndFolders={props.fetchFilesAndFolders}
           closeNewFileModal={() => {
             setNewFileModalState(false);
@@ -205,6 +199,7 @@ const Content = (props) => {
     successModal,
     fullScreenLoading,
   } = useContext(Context);
+  const { files, folders } = useContext(FolderContext);
 
   const confirmDeleteFile = (onDelete) => {
     infoModal.showInfoModal(
@@ -220,9 +215,10 @@ const Content = (props) => {
     const fileService = new FileService();
     const response = await fileService.downloadFile(fileId);
     if (response.status === 200) {
-      const data = await response.arrayBuffer(response);
-      previewModal.showPreviewModal(data, action, fileType, fileName);
-      URL.createObjectURL(new Blob([data]));
+      const data = await response.arrayBuffer();
+      const url = URL.createObjectURL(new Blob([data]));
+      console.log(url);
+      previewModal.showPreviewModal(url, action, fileType, fileName);
       fullScreenLoading.close();
     } else {
       errorModal.showErrorModal("Failed to download file");
@@ -266,14 +262,15 @@ const Content = (props) => {
   return (
     <div>
       {infoModal.infoModalState && <InfoModal />}
-      {props.folders.length === 0 && props.files.length === 0 && (
+
+      {folders.length === 0 && files.length === 0 && (
         <div className="d-flex justify-content-center align-items-center">
           This folder is empty.
         </div>
       )}
       <Row>
-        {props.folders.length !== 0 && <span>Folders</span>}
-        {props.folders.map((folder) => {
+        {folders.length !== 0 && <span>Folders</span>}
+        {folders.map((folder) => {
           return (
             <Col lg="3" md="4" sm="6" xs="6" key={folder.folderId}>
               <OverlayTrigger
@@ -301,8 +298,8 @@ const Content = (props) => {
         })}
       </Row>
       <Row>
-        {props.files.length !== 0 && <span>Files</span>}
-        {props.files.map((file) => {
+        {files.length !== 0 && <span>Files</span>}
+        {files.map((file) => {
           return (
             <Col lg="3" md="4" sm="6" xs="6" key={file.fileId}>
               <OverlayTrigger
@@ -340,7 +337,7 @@ const Content = (props) => {
                           }}>
                           Download
                         </Dropdown.Item>
-                        <Dropdown.Item>Modify Permissions</Dropdown.Item>
+
                         <Dropdown.Item
                           onClick={() => {
                             confirmDeleteFile(() => deleteFile(file.fileId));

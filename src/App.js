@@ -12,6 +12,7 @@ import { Login } from "./pages/Login";
 import { SessionService } from "./service/SessionService";
 
 export const Context = React.createContext();
+export const FolderContext = React.createContext();
 
 function App() {
   const [errorModalState, setErrorModalState] = useState(false);

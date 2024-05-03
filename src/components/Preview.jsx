@@ -1,13 +1,17 @@
+import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { BasicSpinner } from "./Spinners";
+
 export const PreviewFile = (props) => {
   const [isLoading, setIsLoading] = useState(true);
+  const docs = [{ uri: `${props.previewBinary}`, fileName: "test" }];
 
   //check if file type is like docx then convert
 
   // Assuming you fetch or process binary data asynchronously
   useEffect(() => {
+    console.log(props.previewBinary);
     setIsLoading(false);
   }, []);
 
@@ -25,7 +29,11 @@ export const PreviewFile = (props) => {
           <Modal.Title>{props.previewModalHeading}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="d-flex justify-content-center">
-          {isLoading ? <BasicSpinner /> : "insert viewer here"}
+          {isLoading ? (
+            <BasicSpinner />
+          ) : (
+            <DocViewer documents={docs} pluginRenderers={DocViewerRenderers} />
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={props.closePreviewModal}>

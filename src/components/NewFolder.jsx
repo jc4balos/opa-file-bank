@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
-import { Context } from "../App";
+import { Context, FolderContext } from "../App";
 import { FolderService } from "../service/FolderService";
 
 export const NewFolder = (props) => {
@@ -8,7 +8,8 @@ export const NewFolder = (props) => {
   const [folderDescription, setFolderDescription] = useState("");
   const { errorModal, successModal, fullScreenLoading } = useContext(Context);
 
-  const parentFolderId = props.currentFolderId;
+  const { folderId } = useContext(FolderContext);
+  const currentFolderId = parseInt(folderId);
 
   const addFolder = async () => {
     fullScreenLoading.show();
@@ -16,7 +17,7 @@ export const NewFolder = (props) => {
     const data = {
       folderName: folderName,
       folderDescription: folderDescription,
-      folderParentId: parentFolderId,
+      folderParentId: currentFolderId,
     };
     try {
       const response = await folderService.addFolder(data);
@@ -32,7 +33,7 @@ export const NewFolder = (props) => {
     } catch (error) {
       errorModal.showErrorModal(JSON.stringify(error.message));
     } finally {
-      props.fetchFilesAndFolders();
+      props.fetchFilesAndFolders(currentFolderId);
       fullScreenLoading.close();
     }
   };
