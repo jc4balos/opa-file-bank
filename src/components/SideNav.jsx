@@ -1,11 +1,13 @@
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faLockOpen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useState } from "react";
 import { ListGroup, ProgressBar, Stack } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import { Context } from "../App";
 import { StorageService } from "../service/StorageService";
 
 export const SideNav = (props) => {
+  const navigate = useNavigate();
   const [storages, setStorages] = useState([]);
   const { userData, errorModal } = useContext(Context);
 
@@ -25,17 +27,24 @@ export const SideNav = (props) => {
     }
   };
 
+  const goToTrash = () => {
+    navigate("/trash");
+  };
+
+  const goToAdmin = () => {
+    navigate("/admin");
+  };
+
   return (
     <Stack className="">
       <span className="fw-bold text-center">{userData.userFullName}</span>
       <small className="text-center">{userData.userTitle}</small>
       <small className="text-muted text-center">@{userData.userName}</small>
 
-      <ListGroup as="ul" className="mt-3">
+      <ListGroup variant="flush" className="mt-3">
         {storages.map((storage, index) => {
           return (
             <ListGroup.Item
-              as="li"
               className="text-center d-flex flex-column"
               key={index}>
               <span className="fw-bold">{storage.driveName}</span>
@@ -54,8 +63,19 @@ export const SideNav = (props) => {
           );
         })}
 
-        <ListGroup.Item as="li">
+        <ListGroup.Item
+          action
+          onClick={() => {
+            goToTrash();
+          }}>
           <FontAwesomeIcon icon={faTrash} /> Trash
+        </ListGroup.Item>
+        <ListGroup.Item
+          action
+          onClick={() => {
+            goToAdmin();
+          }}>
+          <FontAwesomeIcon icon={faLockOpen} /> Admin
         </ListGroup.Item>
       </ListGroup>
     </Stack>
