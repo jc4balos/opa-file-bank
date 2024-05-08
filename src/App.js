@@ -9,6 +9,7 @@ import { SuccessModal } from "./components/SuccessModal";
 import { Admin } from "./pages/Admin";
 import { Dashboard } from "./pages/Dashboard";
 import { Login } from "./pages/Login";
+import { Trash } from "./pages/Trash";
 import { SessionService } from "./service/SessionService";
 
 export const Context = React.createContext();
@@ -33,6 +34,7 @@ function App() {
   const [previewModalAction, setPreviewModalAction] = useState(() => {});
   const [previewFileType, setPreviewFileType] = useState("");
   const [previewFileName, setPreviewFileName] = useState("");
+  const [previewMimeType, setPreviewMimeType] = useState("");
 
   const [userFullName, setUserFullName] = useState("");
   const [userName, setUserName] = useState("");
@@ -185,12 +187,19 @@ function App() {
    * @param {string} fileType - The type of the file being previewed.
    * @param {string} fileName - The name of the file being previewed.
    */
-  const showPreviewModal = (binary, modalAction, fileType, fileName) => {
+  const showPreviewModal = (
+    binary,
+    modalAction,
+    fileType,
+    fileName,
+    mimeType
+  ) => {
     setPreviewBinary(binary);
     setPreviewModalAction(() => modalAction);
     setPreviewFileType(fileType);
     setPreviewFileName(fileName);
     setPreviewModalState(true);
+    setPreviewMimeType(mimeType);
   };
 
   /**
@@ -265,6 +274,7 @@ function App() {
           <Route path="/dashboard/:folderId" element={<Dashboard />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/trash" element={<Trash />} />
         </Routes>
 
         {previewModalState && (
@@ -277,6 +287,7 @@ function App() {
             previewModalAction={previewModalAction}
             previewFileType={previewFileType}
             previewFileName={previewFileName}
+            previewMimeType={previewMimeType}
           />
         )}
         {errorModalState && (

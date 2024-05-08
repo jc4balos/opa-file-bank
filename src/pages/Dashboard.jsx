@@ -20,7 +20,7 @@ import {
   Row,
   Tooltip,
 } from "react-bootstrap";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Context, FolderContext } from "../App";
 import { InfoModal } from "../components/InfoModal";
 import { Navigation } from "../components/Navigation";
@@ -34,6 +34,7 @@ import { FolderService } from "../service/FolderService";
 export const Dashboard = () => {
   const location = useLocation();
 
+  const navigate = useNavigate();
   const { folderId } = useParams();
   const { errorModal, userData, fullScreenLoading, session } =
     useContext(Context);
@@ -41,21 +42,25 @@ export const Dashboard = () => {
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
   const [backButtonFolderId, setBackButtonFolderId] = useState(null);
-
   useEffect(() => {
     session.fetchSessionData(location);
 
     if (userData.userId) {
       fetchFilesAndFolders(folderId);
+
+      console.log("folderId", folderId);
+      console.log(folders);
     }
   }, [userData.userId]);
 
   const goToFolder = async (folderId) => {
-    window.history.replaceState(
-      null,
-      "OPA File Bank",
-      `/dashboard/${folderId}`
-    );
+    // window.history.replaceState(
+    //   null,
+    //   "OPA File Bank",
+    //   `/dashboard/${folderId}`
+    // );
+
+    navigate(`/dashboard/${folderId}`);
     fetchFilesAndFolders(folderId);
   };
 
@@ -210,18 +215,28 @@ const Content = (props) => {
     );
   };
 
-  const previewFile = async (fileId, action, fileName, fileType) => {
+  const previewFile = async (fileId, action, fileName, fileType, mimeType) => {
     fullScreenLoading.show();
     const fileService = new FileService();
-    const response = await fileService.downloadFile(fileId);
-    if (response.status === 200) {
-      const data = await response.arrayBuffer();
-      const url = URL.createObjectURL(new Blob([data]));
-      console.log(url);
-      previewModal.showPreviewModal(url, action, fileType, fileName);
-      fullScreenLoading.close();
-    } else {
-      errorModal.showErrorModal("Failed to download file");
+    try {
+      const response = await fileService.downloadFile(fileId);
+      if (response.status === 200) {
+        const data = await response.arrayBuffer();
+
+        const blob = await new Blob([data], { type: mimeType });
+        previewModal.showPreviewModal(
+          blob,
+          action,
+          fileType,
+          fileName,
+          mimeType
+        );
+      } else {
+        throw new Error("Failed to download file");
+      }
+    } catch (error) {
+      errorModal.showErrorModal(error.message);
+    } finally {
       fullScreenLoading.close();
     }
   };
@@ -408,7 +423,8 @@ const Content = (props) => {
                                 file.fileName + "." + file.fileType
                               ),
                             file.fileName,
-                            file.fileType
+                            file.fileType,
+                            file.mimeType
                           );
                         }}
                         style={{ fontSize: "30px" }}

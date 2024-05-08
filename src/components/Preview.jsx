@@ -5,13 +5,25 @@ import { BasicSpinner } from "./Spinners";
 
 export const PreviewFile = (props) => {
   const [isLoading, setIsLoading] = useState(true);
-  const docs = [{ uri: `${props.previewBinary}`, fileName: "test" }];
+  const docs = [
+    {
+      uri: window.URL.createObjectURL(props.previewBinary),
+      fileName: `${props.previewFileName}.${props.previewFileType}`,
+      fileType: `${props.previewMimeType}`,
+    },
+  ];
+
+  useEffect(() => {
+    return () => {
+      docs.forEach((doc) => URL.revokeObjectURL(doc.uri));
+    };
+  }, [docs]);
 
   //check if file type is like docx then convert
 
   // Assuming you fetch or process binary data asynchronously
   useEffect(() => {
-    console.log(props.previewBinary);
+    console.log(window.URL.createObjectURL(props.previewBinary));
     setIsLoading(false);
   }, []);
 
