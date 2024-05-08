@@ -215,13 +215,24 @@ const Content = (props) => {
     );
   };
 
-  const previewFile = async (fileId, action, fileName, fileType, mimeType) => {
+  const previewFile = async (
+    fileId,
+    action,
+    fileName,
+    fileType,
+    mimeType,
+    file
+  ) => {
     fullScreenLoading.show();
     const fileService = new FileService();
     try {
       const response = await fileService.downloadFile(fileId);
       if (response.status === 200) {
         const data = await response.arrayBuffer();
+        console.log(
+          "Downloaded data mime type:",
+          response.headers.get("Content-Type")
+        ); // Log the actual mime type from response headers
 
         const blob = await new Blob([data], { type: mimeType });
         previewModal.showPreviewModal(
@@ -229,7 +240,8 @@ const Content = (props) => {
           action,
           fileType,
           fileName,
-          mimeType
+          mimeType,
+          file
         );
       } else {
         throw new Error("Failed to download file");
@@ -241,21 +253,19 @@ const Content = (props) => {
     }
   };
 
-  const downloadFile = (fileId, fileName) => {
+  const downloadFile = async (fileId, fileName, mimeType) => {
     const fileService = new FileService();
-    fileService.downloadFile(fileId).then((response) => {
-      if (response.status === 200) {
-        response.blob().then((blob) => {
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = fileName;
-          a.click();
-        });
-      } else {
-        errorModal.showErrorModal("Failed to download file");
-      }
-    });
+    const response = await fileService.downloadFile(fileId, mimeType);
+    if (response.status === 200) {
+      const blob = await response.blob();
+      const url = await window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      a.click();
+    } else {
+      errorModal.showErrorModal("Failed to download file");
+    }
   };
 
   const deleteFile = (fileId, currentFolderId) => {
@@ -424,7 +434,8 @@ const Content = (props) => {
                               ),
                             file.fileName,
                             file.fileType,
-                            file.mimeType
+                            file.mimeType,
+                            file
                           );
                         }}
                         style={{ fontSize: "30px" }}

@@ -35,6 +35,7 @@ function App() {
   const [previewFileType, setPreviewFileType] = useState("");
   const [previewFileName, setPreviewFileName] = useState("");
   const [previewMimeType, setPreviewMimeType] = useState("");
+  const [file, setFile] = useState({});
 
   const [userFullName, setUserFullName] = useState("");
   const [userName, setUserName] = useState("");
@@ -192,7 +193,8 @@ function App() {
     modalAction,
     fileType,
     fileName,
-    mimeType
+    mimeType,
+    file
   ) => {
     setPreviewBinary(binary);
     setPreviewModalAction(() => modalAction);
@@ -200,6 +202,7 @@ function App() {
     setPreviewFileName(fileName);
     setPreviewModalState(true);
     setPreviewMimeType(mimeType);
+    setFile(file);
   };
 
   /**
@@ -288,6 +291,7 @@ function App() {
             previewFileType={previewFileType}
             previewFileName={previewFileName}
             previewMimeType={previewMimeType}
+            file={file}
           />
         )}
         {errorModalState && (

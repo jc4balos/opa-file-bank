@@ -5,27 +5,29 @@ import { BasicSpinner } from "./Spinners";
 
 export const PreviewFile = (props) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [fileUrl, setFileUrl] = useState("");
+
   const docs = [
     {
-      uri: window.URL.createObjectURL(props.previewBinary),
+      uri: fileUrl,
       fileName: `${props.previewFileName}.${props.previewFileType}`,
-      fileType: `${props.previewMimeType}`,
+      fileType: `${props.previewFileType}`,
+      mimeType: `${props.previewMimeType}`,
     },
   ];
 
   useEffect(() => {
-    return () => {
+    return async () => {
       docs.forEach((doc) => URL.revokeObjectURL(doc.uri));
+      const url = await window.URL.createObjectURL(props.previewBinary);
+      setFileUrl(url);
+      setIsLoading(false);
     };
-  }, [docs]);
+  }, []);
 
   //check if file type is like docx then convert
 
   // Assuming you fetch or process binary data asynchronously
-  useEffect(() => {
-    console.log(window.URL.createObjectURL(props.previewBinary));
-    setIsLoading(false);
-  }, []);
 
   return (
     <div>
@@ -38,22 +40,39 @@ export const PreviewFile = (props) => {
         show={props.showPreviewModal}
         onHide={props.closePreviewModal}>
         <Modal.Header closeButton>
-          <Modal.Title>{props.previewModalHeading}</Modal.Title>
+          <Modal.Title>
+            {" "}
+            <span>
+              Owner <b>{props.file.ownerFullName} </b>
+              <i>{props.file.ownerUsername}</i>
+            </span>
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body className="d-flex justify-content-center">
           {isLoading ? (
             <BasicSpinner />
           ) : (
-            <DocViewer documents={docs} pluginRenderers={DocViewerRenderers} />
+            <DocViewer
+              style={{ maxHeight: "80vh" }}
+              documents={docs}
+              pluginRenderers={DocViewerRenderers}
+            />
           )}
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={props.closePreviewModal}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={props.previewModalAction}>
-            Download
-          </Button>
+        <Modal.Footer className="d-flex justify-content-between">
+          <div className="d-flex flex-column">
+            <span>Created at {props.file.createdDateTime}</span>
+            <span>Last Updated at {props.file.updatedDateTime}</span>
+          </div>
+
+          <div className="d-flex gap-1">
+            <Button variant="secondary" onClick={props.closePreviewModal}>
+              Close
+            </Button>
+            <Button variant="primary" onClick={props.previewModalAction}>
+              Download
+            </Button>
+          </div>
         </Modal.Footer>
       </Modal>
     </div>
