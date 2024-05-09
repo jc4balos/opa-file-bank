@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useContext, useEffect, useState } from "react";
 import {
   Breadcrumb,
+  BreadcrumbItem,
   Button,
   Card,
   Col,
@@ -43,6 +44,7 @@ export const Dashboard = () => {
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
   const [backButtonFolderId, setBackButtonFolderId] = useState(null);
+
   useEffect(() => {
     session.fetchSessionData(location);
 
@@ -130,6 +132,28 @@ export const Dashboard = () => {
 const MainNavigation = (props) => {
   const [newFolderModalState, setNewFolderModalState] = useState(false);
   const [newFileModalState, setNewFileModalState] = useState(false);
+  const { folderId } = useContext(FolderContext);
+  const currentFolderId = parseInt(folderId);
+  const [currentFolderName, setCurrentFolderName] = useState("");
+  const { fullScreenLoading, errorModal } = useContext(Context);
+
+  useEffect(() => {
+    fetchCurrentFolderInfo();
+  }, [folderId]);
+
+  const fetchCurrentFolderInfo = async () => {
+    fullScreenLoading.show();
+    const folderService = new FolderService();
+    const response = await folderService.getFolder(currentFolderId);
+    if (response.status === 200) {
+      const data = await response.json();
+      setCurrentFolderName(data.folderName);
+    } else {
+      const data = await response.json();
+      errorModal.showErrorModal(data);
+    }
+    fullScreenLoading.close();
+  };
 
   return (
     <div>
@@ -161,9 +185,11 @@ const MainNavigation = (props) => {
               }}>
               OPA File Bank
             </Breadcrumb.Item>
+            <BreadcrumbItem>{currentFolderName}</BreadcrumbItem>
           </Breadcrumb>
         </div>
       </div>
+      <h4 className="fw-bold">{currentFolderName}</h4>
 
       <Form className="d-flex align-items-center">
         <FontAwesomeIcon
