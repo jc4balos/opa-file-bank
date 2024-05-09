@@ -90,4 +90,27 @@ export class FolderService {
       return error;
     }
   }
+
+  async modifyFolder(data, folderId) {
+    try {
+      const url = new URL(backendUrl + "/api/v1/folder/modify-folder");
+      const params = new URLSearchParams({
+        folderId: folderId,
+      });
+
+      url.search = params;
+
+      const response = await fetch(url, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      return response;
+    } catch (error) {
+      return error;
+    }
+  }
 }

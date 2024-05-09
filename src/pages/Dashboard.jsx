@@ -23,6 +23,7 @@ import {
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Context, FolderContext } from "../App";
 import { InfoModal } from "../components/InfoModal";
+import { ModifyFolderModal } from "../components/ModifyFolder";
 import { Navigation } from "../components/Navigation";
 import { NewFile } from "../components/NewFile";
 import { NewFolder } from "../components/NewFolder";
@@ -205,6 +206,7 @@ const Content = (props) => {
     fullScreenLoading,
   } = useContext(Context);
   const { files, folders } = useContext(FolderContext);
+  const [modifyFolderState, setModifyFolderState] = useState(false);
 
   const confirmDeleteFile = (onDelete) => {
     infoModal.showInfoModal(
@@ -310,9 +312,33 @@ const Content = (props) => {
     }
   };
 
+  const [modifyFolderName, setModifyFolderName] = useState("");
+  const [modifyFolderDescription, setModifyFolderDescription] = useState("");
+  const [modifyFolderId, setModifyFolderId] = useState(null);
+  const modifyFolder = async (folderName, folderDescription, folderId) => {
+    setModifyFolderName(folderName);
+    setModifyFolderDescription(folderDescription);
+    setModifyFolderId(folderId);
+    setModifyFolderState(true);
+  };
+
   return (
     <div>
       {infoModal.infoModalState && <InfoModal />}
+      {modifyFolderState && (
+        <ModifyFolderModal
+          showModifyFolderModal={modifyFolderState}
+          closeModifyFolderModal={() => {
+            setModifyFolderState(false);
+          }}
+          folderName={modifyFolderName}
+          folderDescription={modifyFolderDescription}
+          setFolderName={setModifyFolderName}
+          setFolderDescription={setModifyFolderDescription}
+          folderId={modifyFolderId}
+          fetchFilesAndFolders={props.fetchFilesAndFolders}
+        />
+      )}
 
       {folders.length === 0 && files.length === 0 && (
         <div className="d-flex justify-content-center align-items-center">
@@ -348,7 +374,16 @@ const Content = (props) => {
                         id="dropdown-basic"></Dropdown.Toggle>
 
                       <Dropdown.Menu>
-                        <Dropdown.Item onClick={() => {}}>Modify</Dropdown.Item>
+                        <Dropdown.Item
+                          onClick={() => {
+                            modifyFolder(
+                              folder.folderName,
+                              folder.folderDescription,
+                              folder.folderId
+                            );
+                          }}>
+                          Modify
+                        </Dropdown.Item>
 
                         <Dropdown.Item
                           onClick={() => {
