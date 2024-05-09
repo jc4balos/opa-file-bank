@@ -99,7 +99,7 @@ export const Dashboard = () => {
   return (
     <FolderContext.Provider value={{ folderId, files, folders }}>
       <Navigation />
-      <div className="m-lg-3 m-1">
+      <div className=" m-3">
         <Row>
           <Col className="d-none d-lg-flex" lg="2">
             <SideNav />
@@ -284,6 +284,15 @@ const Content = (props) => {
     });
   };
 
+  const confirmDeleteFolder = (onDelete) => {
+    infoModal.showInfoModal(
+      "Delete Folder",
+      "Are you sure you want to delete this folder?",
+      onDelete,
+      "Delete"
+    );
+  };
+
   const deleteFolder = async (folderId, currentFolderId) => {
     fullScreenLoading.show();
     const folderService = new FolderService();
@@ -291,6 +300,7 @@ const Content = (props) => {
     if (response.status === 200) {
       const data = await response.json();
       fullScreenLoading.close();
+      infoModal.closeInfoModal();
       successModal.showSuccessModal(data);
       props.fetchFilesAndFolders(currentFolderId);
     } else {
@@ -342,10 +352,12 @@ const Content = (props) => {
 
                         <Dropdown.Item
                           onClick={() => {
-                            deleteFolder(
-                              folder.folderId,
-                              folder.folderParentId
-                            );
+                            confirmDeleteFolder(() => {
+                              deleteFolder(
+                                folder.folderId,
+                                folder.folderParentId
+                              );
+                            });
                           }}>
                           Delete
                         </Dropdown.Item>
