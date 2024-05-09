@@ -68,4 +68,26 @@ export class FolderService {
       return error;
     }
   }
+
+  async deleteFolder(folderId) {
+    try {
+      const url = new URL(backendUrl + "/api/v1/folder/delete-folder");
+      const params = new URLSearchParams({
+        folderId: folderId,
+      });
+
+      url.search = params;
+
+      const response = await fetch(url, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return response;
+    } catch (error) {
+      return error;
+    }
+  }
 }

@@ -10,6 +10,10 @@
   color: var(--bs-secondary);
 }
 
+.pointer-hover:hover {
+  cursor: pointer;
+}
+
 .ellipsis-v {
   transition: background-color 0.5s ease;
 }

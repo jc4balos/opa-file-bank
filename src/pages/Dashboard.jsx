@@ -284,6 +284,22 @@ const Content = (props) => {
     });
   };
 
+  const deleteFolder = async (folderId, currentFolderId) => {
+    fullScreenLoading.show();
+    const folderService = new FolderService();
+    const response = await folderService.deleteFolder(folderId);
+    if (response.status === 200) {
+      const data = await response.json();
+      fullScreenLoading.close();
+      successModal.showSuccessModal(data);
+      props.fetchFilesAndFolders(currentFolderId);
+    } else {
+      const data = await response.json();
+      fullScreenLoading.close();
+      errorModal.showErrorModal(data);
+    }
+  };
+
   return (
     <div>
       {infoModal.infoModalState && <InfoModal />}
@@ -310,11 +326,31 @@ const Content = (props) => {
                   onDoubleClick={() => {
                     props.goToFolder(folder.folderId);
                   }}
-                  className="zoom-on-hover bg-light p-2 m-1">
+                  className="pointer-hover bg-light p-2 m-1">
                   <div className="d-flex justify-content-between align-items-center">
                     <span className="text-truncate">
                       <FontAwesomeIcon icon={faFolder} /> {folder.folderName}
                     </span>
+                    <Dropdown className="ellipsis-v rounded ms-1">
+                      <Dropdown.Toggle
+                        variant="none"
+                        className="p-2 rounded custom-dropdown-toggle"
+                        id="dropdown-basic"></Dropdown.Toggle>
+
+                      <Dropdown.Menu>
+                        <Dropdown.Item onClick={() => {}}>Modify</Dropdown.Item>
+
+                        <Dropdown.Item
+                          onClick={() => {
+                            deleteFolder(
+                              folder.folderId,
+                              folder.folderParentId
+                            );
+                          }}>
+                          Delete
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
                   </div>
                 </Card>
               </OverlayTrigger>
