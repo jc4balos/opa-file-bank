@@ -5,6 +5,7 @@ import {
   faFile,
   faFolder,
   faPlus,
+  faSearch,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -17,6 +18,7 @@ import {
   Col,
   Dropdown,
   Form,
+  InputGroup,
   OverlayTrigger,
   Row,
   Tooltip,
@@ -191,34 +193,48 @@ const MainNavigation = (props) => {
       </div>
       <h4 className="fw-bold">{currentFolderName}</h4>
 
-      <Form className="d-flex align-items-center">
-        <FontAwesomeIcon
-          className="zoom-on-hover me-2"
-          style={{ fontSize: "30px" }}
-          icon={faArrowUpFromBracket}
-          onClick={() => {
-            props.goBackOneFolderUp();
-          }}
-        />
-        <Button
-          variant="outline-secondary"
-          onClick={() => {
-            setNewFileModalState(true);
-          }}
-          className="m-1">
-          <FontAwesomeIcon icon={faPlus} />
-          <span>New File</span>
-        </Button>
-        <Button
-          variant="outline-secondary"
-          onClick={() => {
-            setNewFolderModalState(true);
-          }}
-          className="m-1">
-          <FontAwesomeIcon icon={faFolder} />
-          <span>New Folder</span>
-        </Button>
-      </Form>
+      <div className="d-flex justify-content-between">
+        <Form className="d-flex align-items-center">
+          <FontAwesomeIcon
+            className="zoom-on-hover me-2"
+            style={{ fontSize: "30px" }}
+            icon={faArrowUpFromBracket}
+            onClick={() => {
+              props.goBackOneFolderUp();
+            }}
+          />
+          <Button
+            variant="outline-secondary"
+            onClick={() => {
+              setNewFileModalState(true);
+            }}
+            className="m-1">
+            <FontAwesomeIcon icon={faPlus} />
+            <span>New File</span>
+          </Button>
+          <Button
+            variant="outline-secondary"
+            onClick={() => {
+              setNewFolderModalState(true);
+            }}
+            className="m-1">
+            <FontAwesomeIcon icon={faFolder} />
+            <span>New Folder</span>
+          </Button>
+        </Form>
+        <div>
+          <InputGroup>
+            <InputGroup.Text id="inputGroup-sizing-sm">Search</InputGroup.Text>
+            <Form.Control
+              aria-label="Small"
+              aria-describedby="inputGroup-sizing-sm"
+            />
+            <Button>
+              <FontAwesomeIcon icon={faSearch} />
+            </Button>
+          </InputGroup>
+        </div>
+      </div>
     </div>
   );
 };
