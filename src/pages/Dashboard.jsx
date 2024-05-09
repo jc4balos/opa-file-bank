@@ -138,6 +138,7 @@ const MainNavigation = (props) => {
   const currentFolderId = parseInt(folderId);
   const [currentFolderName, setCurrentFolderName] = useState("");
   const { fullScreenLoading, errorModal } = useContext(Context);
+  const [searchString, setSearchString] = useState("");
 
   useEffect(() => {
     fetchCurrentFolderInfo();
@@ -156,6 +157,8 @@ const MainNavigation = (props) => {
     }
     fullScreenLoading.close();
   };
+
+  const search = () => {};
 
   return (
     <div>
@@ -226,10 +229,15 @@ const MainNavigation = (props) => {
           <InputGroup>
             <InputGroup.Text id="inputGroup-sizing-sm">Search</InputGroup.Text>
             <Form.Control
-              aria-label="Small"
-              aria-describedby="inputGroup-sizing-sm"
+              value={searchString}
+              onChange={(e) => {
+                setSearchString(e.target.value);
+              }}
             />
-            <Button>
+            <Button
+              onClick={() => {
+                search();
+              }}>
               <FontAwesomeIcon icon={faSearch} />
             </Button>
           </InputGroup>

@@ -113,4 +113,6 @@ export class FolderService {
       return error;
     }
   }
+
+  //add global search sevice fetch here
 }
