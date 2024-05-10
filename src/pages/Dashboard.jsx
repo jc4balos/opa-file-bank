@@ -58,6 +58,22 @@ export const Dashboard = () => {
     }
   }, [userData.userId]);
 
+  const search = async (searchString) => {
+    fullScreenLoading.show();
+    const folderService = new FolderService();
+    const response = await folderService.search(searchString);
+    if (response.status === 200) {
+      const data = await response.json();
+      setFolders(data.folders);
+      setFiles(data.files);
+      fullScreenLoading.close();
+    } else {
+      const data = await response.json();
+      fullScreenLoading.close();
+      errorModal.showErrorModal(data);
+    }
+  };
+
   const goToFolder = async (folderId) => {
     // window.history.replaceState(
     //   null,
@@ -117,6 +133,7 @@ export const Dashboard = () => {
               goToFolder={goToFolder}
               setFolderParentId={setFolderParentId}
               goBackOneFolderUp={goBackOneFolderUp}
+              search={search}
             />
             <Content
               fetchFilesAndFolders={fetchFilesAndFolders}
@@ -157,8 +174,6 @@ const MainNavigation = (props) => {
     }
     fullScreenLoading.close();
   };
-
-  const search = () => {};
 
   return (
     <div>
@@ -226,21 +241,29 @@ const MainNavigation = (props) => {
           </Button>
         </Form>
         <div>
-          <InputGroup>
-            <InputGroup.Text id="inputGroup-sizing-sm">Search</InputGroup.Text>
-            <Form.Control
-              value={searchString}
-              onChange={(e) => {
-                setSearchString(e.target.value);
-              }}
-            />
-            <Button
-              onClick={() => {
-                search();
-              }}>
-              <FontAwesomeIcon icon={faSearch} />
-            </Button>
-          </InputGroup>
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault();
+              props.search(searchString);
+            }}>
+            <InputGroup>
+              <InputGroup.Text id="inputGroup-sizing-sm">
+                Search
+              </InputGroup.Text>
+              <Form.Control
+                value={searchString}
+                onChange={(e) => {
+                  setSearchString(e.target.value);
+                }}
+              />
+              <Button
+                onClick={() => {
+                  props.search(searchString);
+                }}>
+                <FontAwesomeIcon icon={faSearch} />
+              </Button>
+            </InputGroup>
+          </Form>
         </div>
       </div>
     </div>

@@ -114,5 +114,27 @@ export class FolderService {
     }
   }
 
-  //add global search sevice fetch here
+  async search(searchString) {
+    try {
+      const url = new URL(
+        backendUrl + "/api/v2/folder/get-files-and-folders/search"
+      );
+      const params = new URLSearchParams({
+        search: searchString,
+      });
+
+      url.search = params;
+
+      const response = await fetch(url, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return response;
+    } catch (error) {
+      return error;
+    }
+  }
 }
