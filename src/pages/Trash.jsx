@@ -27,8 +27,14 @@ import { AdminService } from "../service/AdminService";
 export const Trash = () => {
   const location = useLocation();
 
-  const { errorModal, userData, fullScreenLoading, session } =
-    useContext(Context);
+  const {
+    errorModal,
+    userData,
+    fullScreenLoading,
+    session,
+    infoModal,
+    successModal,
+  } = useContext(Context);
 
   const [deletedFiles, setDeletedFiles] = useState([]);
   const [deletedFolders, setDeletedFolders] = useState([]);
@@ -57,20 +63,56 @@ export const Trash = () => {
     }
   };
 
-  const [foldersToDelete, setFoldersToDelete] = useState([]);
-  const [filesToDelete, setFilesToDelete] = useState([]);
+  const [foldersToDelete, setFoldersToDelete] = useState(new Set());
+  const [filesToDelete, setFilesToDelete] = useState(new Set());
 
-  const addFolderToDelete = () => {};
+  const handleFolderCheckChange = (event, folderId) => {
+    const updatedFoldersToDelete = new Set(foldersToDelete);
+    if (event.target.checked) {
+      updatedFoldersToDelete.add(folderId);
+    } else {
+      updatedFoldersToDelete.delete(folderId);
+    }
+    setFoldersToDelete(updatedFoldersToDelete);
+  };
 
-  const removeFolderToDelete = () => {};
+  const handleFileCheckChange = (event, fileId) => {
+    const updatedFilesToDelete = new Set(filesToDelete);
+    if (event.target.checked) {
+      updatedFilesToDelete.add(fileId);
+    } else {
+      updatedFilesToDelete.delete(fileId);
+    }
+    setFilesToDelete(updatedFilesToDelete);
+  };
 
-  const addFileToDelete = () => {};
+  const confirmDeleteFiles = (onDelete) => {
+    const fileCount = filesToDelete.size + foldersToDelete.size;
+    infoModal.showInfoModal(
+      "Delete Files",
+      `We are going to delete ${fileCount} files. Are you sure you want to proceed?`,
+      onDelete,
+      `Delete Permanently (${fileCount} files)`
+    );
+  };
 
-  const removeFileToDelete = () => {};
-
-  const deleteFilePermanent = () => {};
-
-  const deleteFolderPermanent = () => {};
+  const deleteFilesAndFoldersPermanent = async () => {
+    console.log("executed");
+    fullScreenLoading.show();
+    const adminService = new AdminService();
+    const response = await adminService.deleteTrashFiles(
+      Array.from(foldersToDelete.values()).map(Number),
+      Array.from(filesToDelete.values()).map(Number)
+    );
+    if (response.status === 200) {
+      const data = await response.json();
+      successModal.showSuccessModal(data);
+    } else {
+      const data = await response.json();
+      errorModal.showErrorModal(data);
+    }
+    fullScreenLoading.close();
+  };
 
   const restoreFile = () => {};
 
@@ -85,11 +127,20 @@ export const Trash = () => {
             <SideNav />
           </Col>
           <Col lg="10">
-            <div className="d-flex justify-content-between">
+            <div className="sticky-top bg-white pb-3 pt-3 d-flex justify-content-between">
               <h4 className="fw-bold">Trash</h4>
-              <div>
+              <div className="d-flex align-items-center gap-3">
+                <FormCheck label="Select All" />
                 <ButtonGroup>
-                  <Button variant="outline-danger">Empty Trash</Button>
+                  <Button
+                    variant="outline-danger"
+                    onClick={() => {
+                      confirmDeleteFiles(() =>
+                        deleteFilesAndFoldersPermanent()
+                      );
+                    }}>
+                    Delete Permanently
+                  </Button>
                 </ButtonGroup>
               </div>
             </div>
@@ -111,7 +162,12 @@ export const Trash = () => {
                           className="d-flex justify-content-between align-items-center"
                           style={{ width: "100%" }}>
                           <div className="d-flex text-truncate">
-                            <FormCheck className=" pe-1 ps-1" />
+                            <FormCheck
+                              className=" pe-1 ps-1"
+                              onChange={(e) => {
+                                handleFolderCheckChange(e, folder.folderId);
+                              }}
+                            />
                             <span className="pe-1">
                               <FontAwesomeIcon icon={faFolder} />
                             </span>
@@ -168,7 +224,12 @@ export const Trash = () => {
                           <div
                             className="align-items-center d-flex text-truncate"
                             style={{ width: "100%" }}>
-                            <FormCheck className="pe-1 ps-1" />
+                            <FormCheck
+                              className="pe-1 ps-1"
+                              onChange={(e) => {
+                                handleFileCheckChange(e, file.fileId);
+                              }}
+                            />
 
                             <span className="text-truncate">
                               {file.fileName}
