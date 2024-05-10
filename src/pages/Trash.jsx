@@ -7,9 +7,12 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useContext, useEffect, useState } from "react";
 import {
+  Button,
+  ButtonGroup,
   Card,
   Col,
   Dropdown,
+  FormCheck,
   OverlayTrigger,
   Row,
   Tooltip,
@@ -54,6 +57,17 @@ export const Trash = () => {
     }
   };
 
+  const [foldersToDelete, setFoldersToDelete] = useState([]);
+  const [filesToDelete, setFilesToDelete] = useState([]);
+
+  const addFolderToDelete = () => {};
+
+  const removeFolderToDelete = () => {};
+
+  const addFileToDelete = () => {};
+
+  const removeFileToDelete = () => {};
+
   const deleteFilePermanent = () => {};
 
   const deleteFolderPermanent = () => {};
@@ -71,7 +85,14 @@ export const Trash = () => {
             <SideNav />
           </Col>
           <Col lg="10">
-            <h4 className="fw-bold">Trash</h4>
+            <div className="d-flex justify-content-between">
+              <h4 className="fw-bold">Trash</h4>
+              <div>
+                <ButtonGroup>
+                  <Button variant="outline-danger">Empty Trash</Button>
+                </ButtonGroup>
+              </div>
+            </div>
             <Row>
               {deletedFolders.length !== 0 && <span>Folders</span>}
               {deletedFolders.map((folder) => {
@@ -85,14 +106,39 @@ export const Trash = () => {
                           <div>{folder.folderDescription}</div>
                         </Tooltip>
                       }>
-                      <Card
-                        onDoubleClick={() => {}}
-                        className="zoom-on-hover bg-light p-2 m-1">
-                        <div className="d-flex justify-content-between align-items-center">
-                          <span className="text-truncate">
-                            <FontAwesomeIcon icon={faFolder} />{" "}
-                            {folder.folderName}
-                          </span>
+                      <Card className="pointer-hover bg-light p-2 m-1">
+                        <div
+                          className="d-flex justify-content-between align-items-center"
+                          style={{ width: "100%" }}>
+                          <div className="d-flex text-truncate">
+                            <FormCheck className=" pe-1 ps-1" />
+                            <span className="pe-1">
+                              <FontAwesomeIcon icon={faFolder} />
+                            </span>
+
+                            <span className="text-truncate">
+                              {folder.folderName}
+                            </span>
+                          </div>
+
+                          <Dropdown className="ellipsis-v rounded ms-1">
+                            <Dropdown.Toggle
+                              variant="none"
+                              className="p-2 rounded custom-dropdown-toggle"
+                              id="dropdown-basic"></Dropdown.Toggle>
+
+                            <Dropdown.Menu>
+                              <Dropdown.Item onClick={() => {}}>
+                                Restore
+                              </Dropdown.Item>
+
+                              <Dropdown.Item
+                                variant="danger"
+                                onClick={() => {}}>
+                                Delete Permanently
+                              </Dropdown.Item>
+                            </Dropdown.Menu>
+                          </Dropdown>
                         </div>
                       </Card>
                     </OverlayTrigger>
@@ -122,6 +168,8 @@ export const Trash = () => {
                           <div
                             className="align-items-center d-flex text-truncate"
                             style={{ width: "100%" }}>
+                            <FormCheck className="pe-1 ps-1" />
+
                             <span className="text-truncate">
                               {file.fileName}
                             </span>
