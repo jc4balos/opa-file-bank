@@ -11,8 +11,6 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useContext, useEffect, useState } from "react";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
   Button,
   Card,
   Col,
@@ -195,20 +193,6 @@ const MainNavigation = (props) => {
           }}></NewFile>
       )}
 
-      <div className="d-flex align-items gap-1">
-        <div className="d-flex align-self-center">
-          <Breadcrumb>
-            <Breadcrumb.Item
-              className="d-flex align-items-center"
-              onClick={() => {
-                props.goToFolder(1);
-              }}>
-              OPA File Bank
-            </Breadcrumb.Item>
-            <BreadcrumbItem>{currentFolderName}</BreadcrumbItem>
-          </Breadcrumb>
-        </div>
-      </div>
       <h4 className="fw-bold">{currentFolderName}</h4>
 
       <div className="d-flex justify-content-between">
