@@ -106,12 +106,39 @@ export const Trash = () => {
     );
     if (response.status === 200) {
       const data = await response.json();
+      infoModal.closeInfoModal();
       successModal.showSuccessModal(data);
+      setFoldersToDelete(new Set());
+      setFilesToDelete(new Set());
     } else {
       const data = await response.json();
       errorModal.showErrorModal(data);
     }
+    getAllTrashFiles();
     fullScreenLoading.close();
+  };
+
+  const clearToDelete = () => {
+    filesToDelete.clear();
+    foldersToDelete.clear();
+  };
+
+  const deleteSingleFile = (fileId) => {
+    clearToDelete();
+    filesToDelete.add(fileId);
+
+    confirmDeleteFiles(() => {
+      deleteFilesAndFoldersPermanent();
+    });
+  };
+
+  const deleteSingleFolder = (folderId) => {
+    clearToDelete();
+    foldersToDelete.add(folderId);
+
+    confirmDeleteFiles(() => {
+      deleteFilesAndFoldersPermanent();
+    });
   };
 
   const restoreFile = () => {};
@@ -127,7 +154,7 @@ export const Trash = () => {
             <SideNav />
           </Col>
           <Col lg="10">
-            <div className="sticky-top bg-white pb-3 pt-3 d-flex justify-content-between">
+            <div className="sticky-top bg-white p-lg-3 p-1 d-flex justify-content-between shadow-sm">
               <h4 className="fw-bold">Trash</h4>
               <div className="d-flex align-items-center gap-3">
                 <FormCheck label="Select All" />
@@ -144,7 +171,7 @@ export const Trash = () => {
                 </ButtonGroup>
               </div>
             </div>
-            <Row>
+            <Row className="p-lg-3 p-1">
               {deletedFolders.length !== 0 && <span>Folders</span>}
               {deletedFolders.map((folder) => {
                 return (
@@ -190,7 +217,9 @@ export const Trash = () => {
 
                               <Dropdown.Item
                                 variant="danger"
-                                onClick={() => {}}>
+                                onClick={() => {
+                                  deleteSingleFolder(folder.folderId);
+                                }}>
                                 Delete Permanently
                               </Dropdown.Item>
                             </Dropdown.Menu>
@@ -248,7 +277,10 @@ export const Trash = () => {
                                 Restore
                               </Dropdown.Item>
 
-                              <Dropdown.Item onClick={() => {}}>
+                              <Dropdown.Item
+                                onClick={() => {
+                                  deleteSingleFile(file.fileId);
+                                }}>
                                 Delete Permanently
                               </Dropdown.Item>
                             </Dropdown.Menu>
@@ -287,7 +319,9 @@ export const Trash = () => {
                               className="zoom-on-hover "
                               style={{ fontSize: "30px" }}
                               icon={faTrashAlt}
-                              onClick={() => {}}
+                              onClick={() => {
+                                deleteSingleFile(file.fileId);
+                              }}
                             />
                             <FontAwesomeIcon
                               className="zoom-on-hover "
