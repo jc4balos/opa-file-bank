@@ -1,6 +1,7 @@
 import {
   faFile,
   faFolder,
+  faTrash,
   faTrashAlt,
   faTrashRestore,
 } from "@fortawesome/free-solid-svg-icons";
@@ -159,15 +160,28 @@ export const Trash = () => {
               <div className="d-flex align-items-center gap-3">
                 <FormCheck label="Select All" />
                 <ButtonGroup>
-                  <Button
-                    variant="outline-danger"
-                    onClick={() => {
-                      confirmDeleteFiles(() =>
-                        deleteFilesAndFoldersPermanent()
-                      );
-                    }}>
-                    Delete Permanently
-                  </Button>
+                  {foldersToDelete.size + filesToDelete.size !== 0 ? (
+                    <Button
+                      variant="outline-danger"
+                      onClick={() => {
+                        confirmDeleteFiles(() =>
+                          deleteFilesAndFoldersPermanent()
+                        );
+                      }}>
+                      <FontAwesomeIcon icon={faTrash} /> Delete Permanently
+                    </Button>
+                  ) : (
+                    <Button
+                      disabled
+                      variant="outline-danger"
+                      onClick={() => {
+                        confirmDeleteFiles(() =>
+                          deleteFilesAndFoldersPermanent()
+                        );
+                      }}>
+                      <FontAwesomeIcon icon={faTrash} /> Delete Permanently
+                    </Button>
+                  )}
                 </ButtonGroup>
               </div>
             </div>
