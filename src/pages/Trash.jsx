@@ -3,6 +3,7 @@ import {
   faFolder,
   faTrash,
   faTrashAlt,
+  faTrashCan,
   faTrashRestore,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -49,6 +50,34 @@ export const Trash = () => {
     }
     fullScreenLoading.close();
   }, [userData.userId]);
+
+  const confirmDeleteAllPermanent = (onDeleteAllPermanent) => {
+    infoModal.showInfoModal(
+      "Empty Trash",
+      "Are you sure you want to empty trash? Warning: This is irreversible.",
+      onDeleteAllPermanent,
+      "Empty Trash"
+    );
+  };
+
+  const deleteAllPermanent = async () => {
+    fullScreenLoading.show();
+    const adminService = new AdminService();
+    const response = await adminService.deleteTrashFiles(
+      deletedFolders.map((folder) => folder.folderId),
+      deletedFiles.map((file) => file.fileId)
+    );
+    if (response.status === 200) {
+      const data = await response.json();
+      infoModal.closeInfoModal();
+      successModal.showSuccessModal(data);
+    } else {
+      const data = await response.json();
+      errorModal.showErrorModal(data);
+    }
+    getAllTrashFiles();
+    fullScreenLoading.close();
+  };
 
   const getAllTrashFiles = async () => {
     const adminService = new AdminService();
@@ -207,6 +236,13 @@ export const Trash = () => {
               <div className="d-flex align-items-center gap-3">
                 <FormCheck label="Select All" />
                 <ButtonGroup>
+                  <Button
+                    variant="outline-danger"
+                    onClick={() => {
+                      confirmDeleteAllPermanent(() => deleteAllPermanent());
+                    }}>
+                    <FontAwesomeIcon icon={faTrashCan} /> Empty Trash
+                  </Button>
                   {foldersToDelete.size + filesToDelete.size !== 0 ? (
                     <Button
                       variant="outline-danger"
