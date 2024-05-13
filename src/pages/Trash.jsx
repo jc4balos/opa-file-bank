@@ -144,7 +144,29 @@ export const Trash = () => {
 
   const restoreFile = () => {};
 
-  const restoreFolder = () => {};
+  const confirmRestoreFolder = (onFolderRestore) => {
+    infoModal.showInfoModal(
+      "Restore Folder",
+      "Are you sure you want to restore this folder?",
+      onFolderRestore,
+      "Restore"
+    );
+  };
+
+  const restoreFolder = async (folderId) => {
+    fullScreenLoading.show();
+    const adminService = new AdminService();
+    const response = await adminService.restoreFolder(folderId);
+    if (response.status === 200) {
+      const data = await response.json();
+      infoModal.closeInfoModal();
+      successModal.showSuccessModal(data);
+    } else {
+      const data = await response.json();
+      errorModal.showErrorModal(data);
+    }
+    fullScreenLoading.close();
+  };
 
   return (
     <div>
@@ -225,7 +247,12 @@ export const Trash = () => {
                               id="dropdown-basic"></Dropdown.Toggle>
 
                             <Dropdown.Menu>
-                              <Dropdown.Item onClick={() => {}}>
+                              <Dropdown.Item
+                                onClick={() => {
+                                  confirmRestoreFolder(() => {
+                                    restoreFolder(folder.folderId);
+                                  });
+                                }}>
                                 Restore
                               </Dropdown.Item>
 
@@ -245,7 +272,7 @@ export const Trash = () => {
                 );
               })}
             </Row>
-            <Row>
+            <Row className="p-lg-3 p-1">
               {deletedFiles.length !== 0 && <span>Files</span>}
               {deletedFiles.map((file) => {
                 return (
