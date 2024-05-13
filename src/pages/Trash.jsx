@@ -141,8 +141,31 @@ export const Trash = () => {
       deleteFilesAndFoldersPermanent();
     });
   };
+  const confirmRestoreFile = (onFileRestore) => {
+    infoModal.showInfoModal(
+      "Restore File",
+      "Are you sure you want to restore this file?",
+      onFileRestore,
+      "Restore"
+    );
+  };
 
-  const restoreFile = () => {};
+  const restoreFile = async (fileId) => {
+    fullScreenLoading.show();
+    const adminService = new AdminService();
+    const response = await adminService.restoreFile(fileId);
+    if (response.status === 200) {
+      const data = await response.json();
+      infoModal.closeInfoModal();
+      successModal.showSuccessModal("File successfully restored.");
+    } else {
+      const data = await response.json();
+      errorModal.showErrorModal(data);
+    }
+    getAllTrashFiles();
+
+    fullScreenLoading.close();
+  };
 
   const confirmRestoreFolder = (onFolderRestore) => {
     infoModal.showInfoModal(
@@ -165,6 +188,8 @@ export const Trash = () => {
       const data = await response.json();
       errorModal.showErrorModal(data);
     }
+    getAllTrashFiles();
+
     fullScreenLoading.close();
   };
 
@@ -314,7 +339,12 @@ export const Trash = () => {
                               id="dropdown-basic"></Dropdown.Toggle>
 
                             <Dropdown.Menu>
-                              <Dropdown.Item onClick={() => {}}>
+                              <Dropdown.Item
+                                onClick={() => {
+                                  confirmRestoreFile(() => {
+                                    restoreFile(file.fileId);
+                                  });
+                                }}>
                                 Restore
                               </Dropdown.Item>
 
@@ -366,7 +396,11 @@ export const Trash = () => {
                             />
                             <FontAwesomeIcon
                               className="zoom-on-hover "
-                              onClick={() => {}}
+                              onClick={() => {
+                                confirmRestoreFile(() => {
+                                  restoreFile(file.fileId);
+                                });
+                              }}
                               style={{ fontSize: "30px" }}
                               icon={faTrashRestore}
                             />

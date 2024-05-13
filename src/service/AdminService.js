@@ -59,4 +59,18 @@ export class AdminService {
       return error;
     }
   }
+
+  async restoreFile(fileId) {
+    try {
+      const url = new URL(backendUrl + "/api/v1/file/restore-file");
+      url.search = new URLSearchParams({ fileId: fileId });
+      const response = await fetch(url, {
+        method: "PATCH",
+        credentials: "include",
+      });
+      return response;
+    } catch (error) {
+      return error;
+    }
+  }
 }
