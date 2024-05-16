@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
+import { Context } from "../App";
 import { AccessLevelService } from "../service/AccessLevelService";
 import { UserService } from "../service/UserService";
 
 export const UserEdit = (props) => {
   const [accessLevels, setAccessLevels] = useState([]);
+  const { successModal, errorModal } = useContext(Context);
 
   useEffect(() => {
     getAllAccessLevels();
@@ -18,7 +20,7 @@ export const UserEdit = (props) => {
     if (response.ok) {
       setAccessLevels(data);
     } else {
-      props.showErrorModal(data);
+      errorModal.showErrorModal(data);
     }
   };
 
@@ -37,12 +39,12 @@ export const UserEdit = (props) => {
     };
     const response = await userService.modifyUser(JSON.stringify(data));
     if (response.ok) {
-      props.showSuccessModal("User updated successfully");
+      successModal.showSuccessModal("User updated successfully");
       props.closeUserEditModal();
       window.location.reload();
     } else {
       const data = await response.json();
-      props.showErrorModal(data);
+      errorModal.showErrorModal(data);
     }
   };
 

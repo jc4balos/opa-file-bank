@@ -56,9 +56,6 @@ const AdminNavigation = () => {
       <Tab eventKey="accessLevels" title="Access Levels">
         <AccessLevelsContentAdmin />
       </Tab>
-      <Tab eventKey="trashFiles" title="Trash Files">
-        Tab content for Contact
-      </Tab>
     </Tabs>
   );
 };
@@ -80,9 +77,12 @@ const UsersContentAdmin = () => {
 
   const [users, setUsers] = useState([]);
 
+  const [isReloaded, setIsReloaded] = useState(true);
+
   useEffect(() => {
     fetchUsers();
-  }, []);
+    setIsReloaded(true);
+  }, [isReloaded]);
 
   const fetchUsers = async () => {
     const userService = new UserService();
@@ -130,8 +130,8 @@ const UsersContentAdmin = () => {
     const response = await userService.deactivateUser(userId);
     if (response.status === 200) {
       successModal.showSuccessModal("User Deleted Successfully");
-      fetchUsers();
       infoModal.closeInfoModal();
+      setIsReloaded(false);
     } else {
       const data = response.json();
       errorModal.showErrorModal(data);
