@@ -43,7 +43,7 @@ export const UserAdd = (props) => {
       const data = await response.json();
       successModal.showSuccessModal("User Added Successfully");
       props.closeUserAddModal();
-      window.location.reload();
+      props.setIsReloaded(false);
     } else {
       const data = await response.json();
       errorModal.showErrorModal(data);

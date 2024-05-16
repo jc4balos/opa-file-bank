@@ -20,6 +20,7 @@ export const AccessLevelAdd = (props) => {
       if (response.ok) {
         successModal.showSuccessModal("Access Level successfully added");
         props.closeAddAccessLevelModal();
+        props.setReloaded(false);
       } else {
         const responseData = await response.json();
         errorModal.showErrorModal(responseData);

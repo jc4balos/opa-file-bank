@@ -41,6 +41,7 @@ export const UserEdit = (props) => {
     if (response.ok) {
       successModal.showSuccessModal("User updated successfully");
       props.closeUserEditModal();
+      props.setIsReloaded(false);
     } else {
       const data = await response.json();
       errorModal.showErrorModal(data);

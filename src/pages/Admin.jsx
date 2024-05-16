@@ -163,6 +163,7 @@ const UsersContentAdmin = () => {
           fetchUsers={() => {
             fetchUsers();
           }}
+          setIsReloaded={setIsReloaded}
         />
       )}
 
@@ -189,6 +190,7 @@ const UsersContentAdmin = () => {
           fetchUsers={() => {
             fetchUsers();
           }}
+          setIsReloaded={setIsReloaded}
         />
       )}
       <Stack>
@@ -306,6 +308,7 @@ const AccessLevelsContentAdmin = (props) => {
         <AccessLevelAdd
           showAddAccessLevelModal={addAccessLevelModalState}
           closeAddAccessLevelModal={closeAddAccessLevelModal}
+          setReloaded={setReloaded}
         />
       )}
       <Stack>
