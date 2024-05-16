@@ -41,7 +41,6 @@ export const UserEdit = (props) => {
     if (response.ok) {
       successModal.showSuccessModal("User updated successfully");
       props.closeUserEditModal();
-      window.location.reload();
     } else {
       const data = await response.json();
       errorModal.showErrorModal(data);
@@ -113,7 +112,11 @@ export const UserEdit = (props) => {
             />
 
             <Form.Label>Access Level</Form.Label>
-            <Form.Select>
+            <Form.Select
+              value={props.userAccessLevelId}
+              onChange={(e) => {
+                props.setUserAccesslevelId(e.target.value);
+              }}>
               {accessLevels.map((accessLevel) => {
                 return (
                   <option
