@@ -195,8 +195,8 @@ const MainNavigation = (props) => {
 
       <h4 className="fw-bold">{currentFolderName}</h4>
 
-      <div className="d-flex justify-content-between">
-        <Form className="d-flex align-items-center">
+      <div className="row justify-content-between">
+        <Form className="col-lg-6 col-12 d-flex align-items-center">
           <FontAwesomeIcon
             className="zoom-on-hover me-2"
             style={{ fontSize: "30px" }}
@@ -224,31 +224,29 @@ const MainNavigation = (props) => {
             <span>New Folder</span>
           </Button>
         </Form>
-        <div>
-          <Form
-            onSubmit={(e) => {
-              e.preventDefault();
-              props.search(searchString);
-            }}>
-            <InputGroup>
-              <InputGroup.Text id="inputGroup-sizing-sm">
-                Search
-              </InputGroup.Text>
-              <Form.Control
-                value={searchString}
-                onChange={(e) => {
-                  setSearchString(e.target.value);
-                }}
-              />
-              <Button
-                onClick={() => {
-                  props.search(searchString);
-                }}>
-                <FontAwesomeIcon icon={faSearch} />
-              </Button>
-            </InputGroup>
-          </Form>
-        </div>
+        <Form
+          className="col-lg-6 col-12"
+          onSubmit={(e) => {
+            e.preventDefault();
+            props.search(searchString);
+          }}>
+          <InputGroup>
+            <InputGroup.Text id="inputGroup-sizing-sm">Search</InputGroup.Text>
+            <Form.Control
+              value={searchString}
+              placeholder="Global Search"
+              onChange={(e) => {
+                setSearchString(e.target.value);
+              }}
+            />
+            <Button
+              onClick={() => {
+                props.search(searchString);
+              }}>
+              <FontAwesomeIcon icon={faSearch} />
+            </Button>
+          </InputGroup>
+        </Form>
       </div>
     </div>
   );

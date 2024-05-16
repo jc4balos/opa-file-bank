@@ -31,9 +31,10 @@ export const Navigation = () => {
             <Nav.Link href="/dashboard">Dashboard</Nav.Link>
             <Nav.Link href="/admin">Admin</Nav.Link>
 
-            <Nav.Link href="/">About</Nav.Link>
-
             <Nav.Link className="d-lg-none">Profile</Nav.Link>
+            <Nav.Link href="/trash" className="">
+              Trash
+            </Nav.Link>
 
             {sessionId && (
               <Nav.Link
