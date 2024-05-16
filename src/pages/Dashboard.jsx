@@ -50,9 +50,6 @@ export const Dashboard = () => {
 
     if (userData.userId) {
       fetchFilesAndFolders(folderId);
-
-      console.log("folderId", folderId);
-      console.log(folders);
     }
   }, [userData.userId]);
 

@@ -231,41 +231,43 @@ export const Trash = () => {
             <SideNav />
           </Col>
           <Col lg="10">
-            <div className="sticky-top bg-white p-lg-3 p-1 d-flex justify-content-between shadow-sm">
+            <div className="d-block sticky-top bg-white p-lg-3 p-1 d-lg-flex justify-content-between shadow-sm">
               <h4 className="fw-bold">Trash</h4>
-              <div className="d-flex align-items-center gap-3">
-                <FormCheck label="Select All" />
-                <ButtonGroup>
-                  <Button
-                    variant="outline-danger"
-                    onClick={() => {
-                      confirmDeleteAllPermanent(() => deleteAllPermanent());
-                    }}>
-                    <FontAwesomeIcon icon={faTrashCan} /> Empty Trash
-                  </Button>
-                  {foldersToDelete.size + filesToDelete.size !== 0 ? (
+              <div className="d-flex justify-content-end">
+                <div className=" d-flex align-items-center gap-3">
+                  <FormCheck label="Select All" />
+                  <ButtonGroup>
                     <Button
                       variant="outline-danger"
                       onClick={() => {
-                        confirmDeleteFiles(() =>
-                          deleteFilesAndFoldersPermanent()
-                        );
+                        confirmDeleteAllPermanent(() => deleteAllPermanent());
                       }}>
-                      <FontAwesomeIcon icon={faTrash} /> Delete Permanently
+                      <FontAwesomeIcon icon={faTrashCan} /> Empty Trash
                     </Button>
-                  ) : (
-                    <Button
-                      disabled
-                      variant="outline-danger"
-                      onClick={() => {
-                        confirmDeleteFiles(() =>
-                          deleteFilesAndFoldersPermanent()
-                        );
-                      }}>
-                      <FontAwesomeIcon icon={faTrash} /> Delete Permanently
-                    </Button>
-                  )}
-                </ButtonGroup>
+                    {foldersToDelete.size + filesToDelete.size !== 0 ? (
+                      <Button
+                        variant="outline-danger"
+                        onClick={() => {
+                          confirmDeleteFiles(() =>
+                            deleteFilesAndFoldersPermanent()
+                          );
+                        }}>
+                        <FontAwesomeIcon icon={faTrash} /> Delete Permanently
+                      </Button>
+                    ) : (
+                      <Button
+                        disabled
+                        variant="outline-danger"
+                        onClick={() => {
+                          confirmDeleteFiles(() =>
+                            deleteFilesAndFoldersPermanent()
+                          );
+                        }}>
+                        <FontAwesomeIcon icon={faTrash} /> Delete Permanently
+                      </Button>
+                    )}
+                  </ButtonGroup>
+                </div>
               </div>
             </div>
             <Row className="p-lg-3 p-1">
