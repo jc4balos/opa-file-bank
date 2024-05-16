@@ -257,7 +257,7 @@ const Content = (props) => {
     successModal,
     fullScreenLoading,
   } = useContext(Context);
-  const { files, folders } = useContext(FolderContext);
+  const { files, folders, folderId } = useContext(FolderContext);
   const [modifyFolderState, setModifyFolderState] = useState(false);
 
   const confirmDeleteFile = (onDelete) => {
@@ -283,10 +283,6 @@ const Content = (props) => {
       const response = await fileService.downloadFile(fileId);
       if (response.status === 200) {
         const data = await response.arrayBuffer();
-        console.log(
-          "Downloaded data mime type:",
-          response.headers.get("Content-Type")
-        ); // Log the actual mime type from response headers
 
         const blob = await new Blob([data], { type: mimeType });
         previewModal.showPreviewModal(
@@ -500,7 +496,9 @@ const Content = (props) => {
 
                         <Dropdown.Item
                           onClick={() => {
-                            confirmDeleteFile(() => deleteFile(file.fileId));
+                            confirmDeleteFile(() =>
+                              deleteFile(file.fileId, folderId)
+                            );
                           }}>
                           Delete{" "}
                         </Dropdown.Item>

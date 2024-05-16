@@ -1,13 +1,29 @@
 import { faCog } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Cookies from "js-cookie";
+import { useContext, useEffect, useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
+import { useLocation } from "react-router-dom";
+import { Context } from "../App";
 
 export const Navigation = () => {
   const sessionId = Cookies.get("SESSION");
+  const { userData, session } = useContext(Context);
+  const location = useLocation();
+
+  const [fetchedAccessLevelId, setFetchedAccessLevelId] = useState(null);
+
+  useEffect(() => {
+    initNavigation();
+  }, []);
+
+  const initNavigation = async () => {
+    const sessionData = await session.fetchSessionData(location);
+    setFetchedAccessLevelId(await sessionData.accessLevelId);
+  };
 
   const logOut = () => {
     Cookies.remove("SESSION");
@@ -29,8 +45,11 @@ export const Navigation = () => {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link href="/dashboard">Dashboard</Nav.Link>
-            <Nav.Link href="/admin">Admin</Nav.Link>
-
+            <Nav.Link
+              href="/admin"
+              className={fetchedAccessLevelId != 1 ? "d-none" : ""}>
+              Admin
+            </Nav.Link>
             <Nav.Link className="d-lg-none">Profile</Nav.Link>
             <Nav.Link href="/trash" className="">
               Trash

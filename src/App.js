@@ -245,9 +245,9 @@ function App() {
         data.userId,
         data.accessLevelId
       );
-      console.log(data);
 
       fullScreenLoading.close();
+      return data;
     }
   };
 

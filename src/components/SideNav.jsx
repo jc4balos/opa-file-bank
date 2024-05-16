@@ -2,17 +2,26 @@ import { faLockOpen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useState } from "react";
 import { ListGroup, ProgressBar, Stack } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Context } from "../App";
 import { StorageService } from "../service/StorageService";
 
 export const SideNav = (props) => {
   const navigate = useNavigate();
   const [storages, setStorages] = useState([]);
-  const { userData, errorModal } = useContext(Context);
+  const { userData, errorModal, session } = useContext(Context);
+  const location = useLocation();
+
+  const [fetchedAccessLevelId, setFetchedAccessLevelId] = useState(null);
+
+  const initNavigation = async () => {
+    const sessionData = await session.fetchSessionData(location);
+    setFetchedAccessLevelId(await sessionData.accessLevelId);
+  };
 
   useEffect(() => {
     fetchStorageInfo();
+    initNavigation();
   }, []);
 
   const fetchStorageInfo = async () => {
@@ -71,6 +80,7 @@ export const SideNav = (props) => {
           <FontAwesomeIcon icon={faTrash} /> Trash
         </ListGroup.Item>
         <ListGroup.Item
+          className={fetchedAccessLevelId != 1 ? "d-none" : ""}
           action
           onClick={() => {
             goToAdmin();

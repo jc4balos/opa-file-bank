@@ -86,7 +86,6 @@ export const Trash = () => {
       const data = await response.json();
       setDeletedFiles(data.files);
       setDeletedFolders(data.folders);
-      console.log(data);
     } else {
       const data = await response.json();
       errorModal.showErrorModal(data);
@@ -127,7 +126,6 @@ export const Trash = () => {
   };
 
   const deleteFilesAndFoldersPermanent = async () => {
-    console.log("executed");
     fullScreenLoading.show();
     const adminService = new AdminService();
     const response = await adminService.deleteTrashFiles(
