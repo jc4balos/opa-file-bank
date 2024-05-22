@@ -340,7 +340,7 @@ const AccessLevelsContentAdmin = (props) => {
                           deleteAccessLevel(accessLevel.accessLevelId);
                         });
                       }}
-                    />{" "}
+                    />
                   </div>
                 </div>
               </ListGroup.Item>

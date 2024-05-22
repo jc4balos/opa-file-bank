@@ -337,7 +337,7 @@ const Content = (props) => {
   const confirmDeleteFolder = (onDelete) => {
     infoModal.showInfoModal(
       "Delete Folder",
-      "Are you sure you want to delete this folder?",
+      "Are you sure you want to delete this folder? Files associated in this folder will also be deleted.",
       onDelete,
       "Delete"
     );
